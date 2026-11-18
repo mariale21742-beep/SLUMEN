@@ -1,0 +1,41 @@
+SLUMEN · Página web
+====================
+
+Qué hay en esta carpeta
+- index.html .................. La página completa (una sola página: inicio, Mente, Cuerpo, Espíritu).
+- img/ ........................ Logo, nombre y sol de la marca. Deben ir junto a index.html.
+- img/recorrido/ ........... Capturas largas de cada producto. Se ven en la ventana "Así se ve por dentro" (el celular hace scroll solo).
+  · Para cambiar una, reemplaza el .jpg con el mismo nombre (metodo, podcast, mov, receta, cartas, diario), 600 px de ancho.
+- Guia-Vuelve-a-ti-Slumen.pdf . Guía gratuita (lead magnet) de 7 páginas.
+
+Cómo funciona
+- Es un sitio estático: HTML, CSS y JavaScript en un solo archivo. No necesita instalación ni base de datos.
+- Las fuentes (Cormorant Garamond y Mulish) se cargan desde Google Fonts.
+- Las vistas de cada eje se abren con #mente, #cuerpo y #espiritu al final del dominio.
+  Ejemplo: https://tudominio.com/#cuerpo
+
+Dónde poner los enlaces (Hotmart, Google Forms, Instagram)
+- IMPORTANTE: por ahora los botones de Comprar, la guía y el evento abren las páginas de cada producto en Claude (claude.ai/artifact/...). Son PROVISIONALES: reemplázalos por los links de pago de Hotmart antes de publicar, para que nadie entre a los productos sin pagar.
+- Abre index.html y busca el bloque  const ENLACES = {  cerca del final.
+- Pega cada link entre las comillas de url: "".
+  · inscripcion ..... formulario de Google (Inscríbete)
+  · guiaGratis ...... entrega de la guía gratuita
+  · eventos ......... próximos eventos / HABITARME
+  · acompanamiento .. acompañamiento 1 a 1
+  · metodoMente, movimiento, recetario, mensajes, diario, pack ... links de pago de Hotmart
+  · podcast ......... ya conectado a Spotify
+  · instagram ....... perfil de Instagram
+- Mientras un link esté vacío, el botón muestra el aviso "Aquí irá el enlace de…".
+
+Precios (en la página, COP)
+- Método Slumen Mente ............... $70.000 → $50.000 lanzamiento
+- Movimiento y respiración consciente $70.000 → $50.000
+- Recetario Slumen 30 días .......... $54.900 → $39.900
+- Mensajes para volver a ti ......... $50.000 → $37.000
+- Diario de Gratitud ................ $70.000 → $50.000
+- Pack Vuelve a ti .................. $314.900 → $250.000
+Para cambiarlos, busca  class="precio"  en index.html.
+
+Pendientes de contenido
+- Foto de Aleja: ya está (img/aleja-retrato.jpg).
+- Fechas de HABITARME en "Próximos eventos".

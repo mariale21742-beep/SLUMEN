@@ -1,0 +1,1577 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Slumen: un espacio para volver a ti desde la mente, el cuerpo y el espíritu.">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<title>Slumen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Mulish:wght@400;600;700&display=swap">
+<style>
+/* Layout: una sola página. Portada con el logo y tres "puertas" (Mente, Cuerpo, Espíritu) que abren su propia vista.
+   Bandas lisas de color, mucho aire, una idea por bloque. Mismas fuentes que las páginas de producto de Slumen. */
+:root {
+  --turquesa: #ADFEF5;
+  --rosa: #FFB3F7;
+  --rosa-suave: #FFE6FC;
+  --marfil: #F8F3EB;
+  --hoja: #FFFDF9;
+  --dorado: #826643;
+  --dorado-claro: #B8955F;
+  --lavanda: #B77FF2;
+  --lavanda-suave: #F0E4FE;
+  --texto: #594B43;
+  --texto-suave: #7A6A60;
+  --linea: rgba(89, 75, 67, .18);
+
+  --f-titulo: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --f-cuerpo: "Mulish", "Segoe UI", system-ui, sans-serif;
+
+  --ancho: 1120px;
+  --lento: cubic-bezier(.22, .61, .36, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: auto; }
+.aparece { animation: entrar .8s var(--lento) both; }
+body {
+  background: var(--marfil);
+  color: var(--texto);
+  font: 400 17px/1.7 var(--f-cuerpo);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 30; background: var(--turquesa);
+}
+h1, h2, h3 { font-family: var(--f-titulo); font-weight: 500; line-height: 1.05; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--dorado); outline-offset: 3px; border-radius: 6px; }
+
+.envoltura {
+  max-width: var(--ancho); margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+.banda { padding-block: clamp(64px, 10vw, 128px); }
+.banda--turquesa { background: var(--turquesa); }
+.banda--rosa { background: var(--rosa-suave); }
+.banda--lavanda { background: var(--lavanda-suave); }
+.banda--marfil { background: var(--marfil); }
+
+.etiqueta {
+  font: 700 12px/1 var(--f-cuerpo); letter-spacing: .2em; text-transform: uppercase;
+  color: var(--dorado);
+}
+
+/* ---------- Botones ---------- */
+.boton {
+  display: inline-flex; align-items: center; gap: .6em;
+  font: 700 15px/1 var(--f-cuerpo); text-decoration: none; cursor: pointer;
+  padding: 16px 28px; border-radius: 999px; border: 1px solid transparent;
+  transition: transform .5s var(--lento), background-color .4s, color .4s;
+}
+.boton--lleno { background: var(--dorado); color: var(--marfil); }
+.boton--lleno:hover { background: var(--texto); transform: translateY(-2px); }
+.boton--linea { border-color: var(--texto); color: var(--texto); background: transparent; }
+.boton--linea:hover { background: var(--texto); color: var(--marfil); }
+.boton--chico { padding: 11px 18px; font-size: 14px; }
+.flecha { display: inline-block; transition: transform .5s var(--lento); }
+.boton:hover .flecha, .puerta:hover .flecha { transform: translateX(4px); }
+
+/* ---------- Encabezado ---------- */
+.cabecera {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--turquesa);
+  border-bottom: 1px solid var(--linea);
+}
+.cabecera .envoltura { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 68px; }
+.marca-chica { display: block; text-decoration: none; }
+.marca-chica img { height: 34px; width: auto; }
+.menu { display: flex; align-items: center; gap: 28px; }
+.menu a:not(.boton) {
+  font-size: 15px; font-weight: 600; text-decoration: none; position: relative; padding-block: 6px;
+}
+.menu a:not(.boton)::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--dorado);
+  transform: scaleX(0); transform-origin: left; transition: transform .5s var(--lento);
+}
+.menu a:not(.boton):hover::after, .menu a[aria-current="page"]::after { transform: scaleX(1); }
+.menu .separador { width: 1px; height: 18px; background: var(--linea); }
+.boton-menu {
+  display: none; font: 700 14px/1 var(--f-cuerpo); color: var(--texto); background: none;
+  border: 1px solid var(--texto); border-radius: 999px; padding: 10px 16px; cursor: pointer;
+}
+@media (max-width: 820px) {
+  .boton-menu { display: inline-flex; align-items: center; gap: 8px; }
+  .menu {
+    position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--turquesa); border-bottom: 1px solid var(--linea);
+    padding: 8px max(20px, env(safe-area-inset-right, 0px)) 20px max(20px, env(safe-area-inset-left, 0px));
+  }
+  .menu[data-abierto="no"] { display: none; }
+  .menu a:not(.boton) { font: 500 28px/1.2 var(--f-titulo); padding-block: 14px; border-bottom: 1px solid var(--linea); }
+  .menu a:not(.boton)::after { display: none; }
+  .menu .separador { display: none; }
+  .menu .boton { margin-top: 18px; justify-content: center; }
+}
+
+/* ---------- Vistas ---------- */
+.vista { animation: entrar .9s var(--lento) both; }
+@keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Portada ---------- */
+.portada { position: relative; overflow: hidden; text-align: center; padding-block: clamp(40px, 7vw, 88px) clamp(64px, 9vw, 112px); }
+.halo {
+  position: absolute; left: 50%; top: 34%; width: min(620px, 120vw); aspect-ratio: 1; max-width: none;
+  transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 68%);
+  animation: respirar-halo 12s ease-in-out infinite;
+}
+@keyframes respirar-halo { 0%, 100% { transform: translate(-50%, -50%) scale(.88); } 50% { transform: translate(-50%, -50%) scale(1.04); } }
+.portada .envoltura { position: relative; display: grid; justify-items: center; gap: 22px; }
+.logo-grande { width: min(400px, 82vw); height: auto; }
+.portada h1 { font-size: clamp(48px, 8vw, 96px); font-style: italic; font-weight: 400; margin-top: 6px; }
+.portada .bajada { max-width: 46ch; font-size: clamp(17px, 2vw, 19px); }
+.portada .acciones { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 8px; }
+
+/* ---------- Cinta de palabras ---------- */
+.cinta { background: linear-gradient(100deg, #7A5F3E, #A88C64 50%, #7A5F3E); color: var(--marfil); overflow: hidden; padding-block: 22px; }
+.cinta-pista { display: flex; width: max-content; animation: deslizar 52s linear infinite; }
+.cinta-pista span { font: italic 400 clamp(26px, 3.2vw, 36px)/1 var(--f-titulo); white-space: nowrap; padding-inline: 28px; display: flex; align-items: center; gap: 56px; }
+.cinta-pista span::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: rgba(248, 243, 235, .7); }
+@keyframes deslizar { to { transform: translateX(-50%); } }
+
+/* ---------- Tres puertas ---------- */
+.intro-ejes { display: grid; gap: 16px; margin-bottom: clamp(40px, 6vw, 72px); max-width: 640px; }
+.intro-ejes h2 { font-size: clamp(38px, 5.4vw, 62px); }
+.puertas { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--linea); }
+.puerta {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: clamp(18px, 4vw, 48px);
+  padding-block: clamp(24px, 3.5vw, 40px); border-bottom: 1px solid var(--linea);
+  text-decoration: none; transition: padding .6s var(--lento);
+}
+.puerta:hover { padding-left: 12px; }
+.arco {
+  width: clamp(64px, 9vw, 96px); aspect-ratio: 3 / 4; border-radius: 999px 999px 10px 10px;
+  display: grid; place-items: center; overflow: hidden; transition: transform .7s var(--lento);
+}
+.puerta:hover .arco { transform: translateY(-4px); }
+.arco svg { width: 62%; height: auto; }
+.arco img { width: 92%; height: auto; }
+.arco--mente { background: var(--lavanda-suave); }
+.arco--cuerpo { background: var(--rosa-suave); }
+.arco--espiritu { background: var(--turquesa); }
+.puerta-texto { display: grid; gap: 6px; min-width: 0; }
+.puerta h3 { font-size: clamp(44px, 6.6vw, 80px); }
+.puerta p { color: var(--texto-suave); max-width: 52ch; }
+.circulo-flecha {
+  width: 56px; height: 34px; border: 1px solid var(--texto); border-radius: 999px;
+  display: grid; place-items: center; font-size: 18px; flex: none; transition: background .4s, color .4s;
+}
+.puerta:hover .circulo-flecha { background: var(--texto); color: var(--marfil); }
+@media (max-width: 560px) {
+  .puerta { grid-template-columns: auto 1fr; }
+  .circulo-flecha { display: none; }
+}
+
+/* ---------- Guía gratuita ---------- */
+.guia { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
+.guia-texto { display: grid; gap: 18px; justify-items: start; }
+.guia-texto h2 { font-size: clamp(38px, 5vw, 58px); }
+.gratis { font: 700 13px/1 var(--f-cuerpo); letter-spacing: .08em; background: var(--marfil); border-radius: 999px; padding: 8px 14px; }
+.cuadernillo { position: relative; aspect-ratio: 4 / 5; max-width: 320px; width: 100%; justify-self: center; }
+.cuadernillo .hoja {
+  position: absolute; inset: 0; border-radius: 6px 18px 18px 6px; padding: 12% 10%;
+  display: grid; align-content: space-between; box-shadow: 0 24px 50px -28px rgba(89, 75, 67, .45);
+  transition: transform .9s var(--lento);
+}
+.cuadernillo .h1 { background: var(--lavanda-suave); transform: rotate(-7deg) translate(-8%, 2%); }
+.cuadernillo .h2 { background: var(--rosa); transform: rotate(4deg) translate(6%, 1%); }
+.cuadernillo .h3 { background: var(--turquesa); }
+.cuadernillo:hover .h1 { transform: rotate(-11deg) translate(-14%, 3%); }
+.cuadernillo:hover .h2 { transform: rotate(8deg) translate(12%, 2%); }
+.h3 img { width: 56px; height: 56px; }
+.h3 .t-guia { font: italic 400 clamp(34px, 4.4vw, 46px)/1 var(--f-titulo); }
+.h3 .ejes-guia { display: grid; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+@media (max-width: 760px) { .guia { grid-template-columns: 1fr; } .cuadernillo { max-width: 240px; } }
+
+/* ---------- Detrás de Slumen ---------- */
+.aleja { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
+.retrato {
+  aspect-ratio: 4 / 5; width: 100%; max-width: 360px; justify-self: center;
+  border-radius: 999px 999px 18px 18px; background: var(--rosa-suave);
+  display: grid; place-items: center; text-align: center; padding: 24px;
+  border: 1px dashed var(--dorado-claro); color: var(--texto-suave); font-size: 14px;
+}
+.retrato img { width: 70px; height: 70px; margin: 0 auto 10px; }
+.retrato-foto { width: 100%; max-width: 360px; justify-self: center; aspect-ratio: 4 / 5; height: auto; object-fit: cover; border-radius: 999px 999px 18px 18px; }
+.aleja-texto { display: grid; gap: 18px; }
+.aleja-texto h2 { font-size: clamp(38px, 5vw, 58px); }
+.aleja-texto p { max-width: 58ch; }
+.firma { font: italic 500 30px/1 var(--f-titulo); color: var(--dorado); }
+@media (max-width: 760px) { .aleja { grid-template-columns: 1fr; } .retrato { max-width: 240px; } .retrato-foto { max-width: 260px; } }
+
+/* ---------- Encuentros (fuera de los ejes) ---------- */
+.encuentros-cabeza { display: grid; gap: 14px; max-width: 620px; margin-bottom: 40px; }
+.encuentros-cabeza h2 { font-size: clamp(34px, 4.4vw, 50px); }
+.encuentros-cabeza p { color: var(--texto-suave); }
+.encuentros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.encuentro {
+  border: 1px solid var(--linea); border-radius: 22px; padding: clamp(24px, 3vw, 36px);
+  display: grid; gap: 16px; align-content: start; background: var(--hoja);
+}
+.encuentro h3 { font-size: clamp(30px, 3.4vw, 38px); }
+.evento { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; padding-top: 14px; border-top: 1px solid var(--linea); }
+.fecha {
+  width: 64px; aspect-ratio: 1; border-radius: 50%; background: var(--turquesa);
+  display: grid; place-items: center; text-align: center; font: 700 11px/1.2 var(--f-cuerpo); letter-spacing: .08em; text-transform: uppercase;
+}
+.evento strong { font-weight: 700; display: block; }
+.evento div span { color: var(--texto-suave); font-size: 15px; }
+.evento .fecha { width: 72px; }
+.encuentro .boton { justify-self: start; margin-top: 4px; }
+@media (max-width: 760px) { .encuentros { grid-template-columns: 1fr; } }
+
+/* ---------- Inscríbete ---------- */
+.inscribete { text-align: center; display: grid; justify-items: center; gap: 20px; }
+.inscribete h2 { font-size: clamp(44px, 6.4vw, 76px); }
+.inscribete p { max-width: 44ch; }
+
+/* ---------- Vista de eje ---------- */
+.eje-cabeza { padding-block: clamp(48px, 8vw, 104px); }
+.eje-cabeza .envoltura { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
+.volver { font-size: 15px; font-weight: 600; text-decoration: none; display: inline-flex; gap: 8px; align-items: center; margin-bottom: 28px; }
+.volver:hover { text-decoration: underline; text-underline-offset: 4px; }
+.eje-cabeza h1 { font-size: clamp(72px, 13vw, 160px); font-weight: 400; }
+.eje-cabeza .bajada { font-size: clamp(18px, 2vw, 20px); max-width: 44ch; margin-top: 22px; }
+.pilares { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; list-style: none; padding: 0; }
+.pilares li { font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 249, .7); }
+.simbolo { width: 100%; max-width: 340px; justify-self: center; aspect-ratio: 1; display: grid; place-items: center; position: relative; }
+.simbolo svg { width: 100%; height: auto; overflow: visible; }
+@media (max-width: 760px) {
+  .eje-cabeza .envoltura { grid-template-columns: 1fr; }
+  .simbolo { max-width: 200px; grid-row: 1; justify-self: start; }
+}
+
+/* Mente: el bucle que se abre */
+.trazo { fill: none; stroke: var(--texto); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 620; stroke-dashoffset: 620; animation: dibujar 5s var(--lento) .3s forwards; }
+@keyframes dibujar { to { stroke-dashoffset: 0; } }
+.punto-final { fill: var(--dorado); opacity: 0; animation: aparecer .8s ease 4.6s forwards; }
+@keyframes aparecer { to { opacity: 1; } }
+
+/* Cuerpo: el círculo que respira */
+.respira { transform-origin: 50% 50%; animation: respirar 10s ease-in-out infinite; }
+.respira-2 { animation-delay: -.4s; }
+@keyframes respirar { 0%, 100% { transform: scale(.72); } 45%, 55% { transform: scale(1); } }
+.respira-texto { position: absolute; inset: 0; display: grid; place-items: center; font: italic 500 26px/1 var(--f-titulo); }
+.respira-texto span { grid-area: 1 / 1; animation: alternar 10s ease-in-out infinite; }
+.respira-texto span:last-child { animation-delay: -5s; }
+@keyframes alternar { 0%, 8% { opacity: 0; } 15%, 40% { opacity: 1; } 47%, 100% { opacity: 0; } }
+
+/* Espíritu: el sol del logo, girando despacio */
+.sol-gira {
+  width: 100%; height: auto; border-radius: 50%;
+  -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 71%);
+  mask-image: radial-gradient(circle, #000 58%, transparent 71%);
+  animation: girar 80s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* ---------- Productos ---------- */
+.productos-cabeza { margin-bottom: 36px; }
+.productos-cabeza h2 { font-size: clamp(34px, 4.4vw, 50px); }
+.productos { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.productos > .producto { flex: 0 1 calc(50% - 10px); min-width: 0; }
+.producto {
+  background: var(--hoja); border: 1px solid var(--linea); border-radius: 26px;
+  padding: clamp(26px, 3.4vw, 40px); display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 16px;
+  transition: transform .7s var(--lento), box-shadow .7s var(--lento);
+}
+.producto:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -40px rgba(89, 75, 67, .5); }
+.producto .tipo { font: 700 12px/1 var(--f-cuerpo); letter-spacing: .16em; text-transform: uppercase; color: var(--dorado); }
+.producto h3 { font-size: clamp(32px, 3.4vw, 40px); }
+.producto .frase { font: italic 500 21px/1.3 var(--f-titulo); color: var(--dorado); }
+.producto ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; align-content: start; }
+.producto li { display: grid; grid-template-columns: 14px 1fr; gap: 12px; font-size: 16px; }
+.producto li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; margin-top: .66em; background: var(--dorado-claro); }
+.producto .pasos-mente { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.producto .pasos-mente li { display: block; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--lavanda-suave); }
+.producto .pasos-mente li::before { display: none; }
+.compra { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid var(--linea); }
+.precio { font: 500 30px/1 var(--f-titulo); font-variant-numeric: lining-nums; }
+.precio s { font-size: 20px; color: var(--texto-suave); margin-right: 6px; }
+.precio small { display: block; margin-top: 8px; font: 700 10px/1 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; color: var(--dorado); }
+
+/* ---------- Pack ---------- */
+.pack { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
+.pack-texto { display: grid; gap: 18px; justify-items: start; }
+.pack-texto h2 { font-size: clamp(44px, 6vw, 72px); }
+.pack-texto p { max-width: 46ch; }
+.pack-lista { background: var(--hoja); border-radius: 26px; padding: clamp(24px, 3vw, 36px); display: grid; gap: 4px; }
+.pack-lista > div:not(.compra) { display: grid; grid-template-columns: 90px 1fr; gap: 12px; align-items: baseline; padding-block: 12px; border-bottom: 1px solid var(--linea); }
+.pack-lista > div:nth-last-child(2) { border-bottom: 0; }
+.pack-lista > div:not(.compra) > span { font: 700 11px/1 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; color: var(--dorado); }
+.pack-lista b { font: 500 22px/1.2 var(--f-titulo); }
+.pack-lista .compra { margin-top: 12px; }
+@media (max-width: 760px) { .pack { grid-template-columns: 1fr; } }
+
+.precio--pendiente { font: 700 13px/1 var(--f-cuerpo); border: 1px dashed var(--dorado-claro); color: var(--dorado); border-radius: 999px; padding: 8px 12px; }
+.precio--gratis { font: italic 500 26px/1 var(--f-titulo); }
+@media (max-width: 760px) { .productos > .producto { flex-basis: 100%; } }
+
+.afirmacion { text-align: center; display: grid; gap: 18px; justify-items: center; }
+.afirmacion blockquote { margin: 0; font: italic 400 clamp(32px, 4.6vw, 52px)/1.2 var(--f-titulo); max-width: 24ch; text-wrap: balance; }
+
+.siguiente { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; }
+.siguiente a.grande { font: 400 clamp(36px, 5.4vw, 60px)/1.1 var(--f-titulo); text-decoration: none; display: inline-flex; gap: 18px; align-items: center; }
+.siguiente .volver { margin-bottom: 0; }
+
+/* ---------- Pie ---------- */
+.pie { border-top: 1px solid var(--linea); padding-block: 48px; background: var(--marfil); }
+.pie .envoltura { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: center; }
+.pie .lema-pie { font: 700 12px/1 var(--f-cuerpo); letter-spacing: .28em; text-transform: uppercase; color: var(--dorado); }
+.pie nav { display: flex; gap: 22px; flex-wrap: wrap; font-size: 15px; font-weight: 600; }
+.pie nav a { text-decoration: none; }
+.pie nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pie small { color: var(--texto-suave); font: italic 500 22px/1 var(--f-titulo); }
+
+/* ---------- Aviso de enlace pendiente ---------- */
+.aviso {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--texto); color: var(--marfil); border-radius: 999px; padding: 12px 20px; font-size: 15px;
+  max-width: calc(100vw - 40px); text-align: center; transition: opacity .4s, transform .5s var(--lento);
+}
+.aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+
+
+/* ---------- Test Slumen ---------- */
+.test { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(32px, 6vw, 80px); align-items: start; }
+.test-intro { display: grid; gap: 18px; }
+.test-intro h2 { font-size: clamp(38px, 5vw, 58px); }
+.test-intro p { max-width: 48ch; }
+.test-nota { font-size: 14px; color: var(--texto-suave); }
+.test-tarjeta { background: var(--hoja); border: 1px solid var(--linea); border-radius: 26px; padding: clamp(24px, 3.4vw, 40px); display: grid; gap: 20px; min-height: 360px; align-content: start; }
+.test-avance { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 700 12px/1 var(--f-cuerpo); letter-spacing: .16em; text-transform: uppercase; color: var(--dorado); }
+.test-barra { height: 4px; border-radius: 999px; background: var(--lavanda-suave); overflow: hidden; }
+.test-barra i { display: block; height: 100%; background: var(--dorado); border-radius: 999px; transition: width .6s var(--lento); }
+.test-pregunta { font: 500 clamp(28px, 3.4vw, 38px)/1.15 var(--f-titulo); text-wrap: balance; animation: entrar .6s var(--lento) both; }
+.test-opciones { display: grid; gap: 10px; }
+.test-opcion {
+  font: 600 16px/1.2 var(--f-cuerpo); color: var(--texto); text-align: left; cursor: pointer;
+  background: transparent; border: 1px solid var(--linea); border-radius: 999px; padding: 15px 22px;
+  display: flex; align-items: center; gap: 14px; transition: background .3s, border-color .3s, transform .4s var(--lento);
+}
+.test-opcion::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--dorado); flex: none; transition: background .3s; }
+.test-opcion:hover { border-color: var(--dorado); transform: translateX(4px); }
+.test-opcion[aria-pressed="true"] { background: var(--lavanda-suave); border-color: var(--dorado); }
+.test-opcion[aria-pressed="true"]::before { background: var(--dorado); }
+.test-pie { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.test-atras { font: 600 15px/1 var(--f-cuerpo); color: var(--texto); background: none; border: 0; padding: 8px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.test-atras[disabled] { opacity: .35; cursor: default; text-decoration: none; }
+.test-resultado { display: grid; gap: 18px; animation: entrar .7s var(--lento) both; }
+.test-resultado h3 { font-size: clamp(40px, 5vw, 60px); }
+.test-resultado .frase { font: italic 500 22px/1.3 var(--f-titulo); color: var(--dorado); }
+.test-ejes { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.test-ejes li { display: grid; grid-template-columns: 84px minmax(0, 1fr) 56px; gap: 12px; align-items: center; font-size: 15px; font-weight: 600; }
+.test-ejes .pista { height: 10px; border-radius: 999px; background: var(--marfil); overflow: hidden; }
+.test-ejes .pista i { display: block; height: 100%; border-radius: 999px; }
+.test-ejes .mente i { background: var(--lavanda); }
+.test-ejes .cuerpo i { background: var(--rosa); }
+.test-ejes .espiritu i { background: #7fe6d8; }
+.test-ejes .n { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; color: var(--texto-suave); }
+.test-acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+@media (max-width: 760px) { .test { grid-template-columns: 1fr; } .test-tarjeta { min-height: 0; } }
+
+
+/* ---------- Historia de Aleja (página aparte) ---------- */
+.enlace-aleja { justify-self: start; font: 700 15px/1 var(--f-cuerpo); color: var(--dorado); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; padding-block: 6px; border-bottom: 1px solid var(--dorado-claro); }
+.enlace-aleja:hover .flecha { transform: translateX(4px); }
+.historia-cabeza { padding-block: clamp(48px, 8vw, 96px); }
+.historia-intro { display: flex; justify-content: center; align-items: center; gap: clamp(28px, 4vw, 56px); }
+.historia-intro .historia-texto { flex: 0 1 clamp(320px, 32vw, 430px); min-width: 0; }
+.historia-intro .retrato-foto { flex: 0 0 auto; width: clamp(240px, 28vw, 340px); max-width: none; }
+.historia-texto { display: grid; gap: 18px; justify-items: start; }
+.historia-texto .volver { margin-bottom: 10px; }
+.historia-texto h1 { font-size: clamp(52px, 7vw, 96px); font-weight: 400; }
+.historia-bajada { font: italic 500 clamp(22px, 2.4vw, 28px)/1.35 var(--f-titulo); color: var(--dorado); max-width: 30ch; }
+.camino { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; display: grid; gap: 0; position: relative; }
+.camino::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 1px; background: var(--dorado-claro); }
+.camino li { position: relative; padding: 0 0 clamp(36px, 5vw, 56px) 44px; display: grid; gap: 10px; }
+.camino li:last-child { padding-bottom: 0; }
+.camino li::before { content: ""; position: absolute; left: 0; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: var(--marfil); border: 1.5px solid var(--dorado); }
+.camino li:nth-child(1)::before { background: var(--rosa); }
+.camino li:nth-child(2)::before { background: var(--lavanda-suave); }
+.camino li:nth-child(3)::before { background: var(--turquesa); }
+.camino li:nth-child(4)::before { background: var(--rosa-suave); }
+.camino li:nth-child(5)::before { background: var(--dorado); }
+.camino h2 { font-size: clamp(32px, 4vw, 44px); }
+.camino p { max-width: 60ch; }
+.afirmacion .firma { margin-top: 6px; }
+@media (max-width: 760px) { .historia-intro { flex-direction: column; align-items: flex-start; } .historia-intro .historia-texto { flex: none; } .historia-intro .retrato-foto { order: -1; width: 220px; } }
+
+
+/* ---------- ¿Por cuál empezar? ---------- */
+.eleccion { display: grid; gap: 24px; margin-bottom: clamp(48px, 7vw, 80px); }
+.eleccion-cabeza { display: grid; gap: 12px; }
+.eleccion-cabeza h2 { font-size: clamp(34px, 4.4vw, 50px); }
+.eleccion-opciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.opcion { border-top: 1px solid var(--dorado); padding-top: 18px; display: grid; gap: 8px; align-content: start; }
+.opcion--primera { border-top-width: 3px; }
+.opcion-cuando { font: 700 12px/1 var(--f-cuerpo); letter-spacing: .16em; text-transform: uppercase; color: var(--dorado); }
+.opcion h3 { font-size: clamp(28px, 3vw, 34px); }
+.opcion p { max-width: 52ch; }
+.insignia { justify-self: start; font: 700 11px/1 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; background: var(--turquesa); border-radius: 999px; padding: 7px 12px; }
+@media (max-width: 760px) { .eleccion-opciones { grid-template-columns: 1fr; } }
+
+
+/* ---------- Así se ve por dentro: botón y ventana con celular ---------- */
+.producto { display: flex; flex-direction: column; }
+.producto > .compra { margin-top: auto; }
+.ver-dentro {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  font: 700 12px/1 var(--f-cuerpo); letter-spacing: .14em; text-transform: uppercase; color: var(--texto);
+  background: var(--turquesa); border: 0; border-radius: 999px; padding: 9px 16px 9px 10px;
+  transition: transform .4s var(--lento), box-shadow .4s var(--lento);
+}
+.ver-dentro:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -14px rgba(89, 75, 67, .8); }
+.ver-dentro:focus-visible { outline: 2px solid var(--dorado); outline-offset: 3px; }
+.ver-dentro .mini-cel { width: 14px; height: 22px; border: 2px solid var(--texto); border-radius: 4px; position: relative; flex: none; }
+.ver-dentro .mini-cel::after { content: ""; position: absolute; left: 3px; right: 3px; top: 3px; height: 2px; background: var(--dorado); border-radius: 2px; animation: mini-sube 2.4s var(--lento) infinite; }
+@keyframes mini-sube { 0% { top: 13px; opacity: 0; } 30% { opacity: 1; } 100% { top: 2px; opacity: 0; } }
+
+.visor { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; }
+.visor[hidden] { display: none; }
+.visor-fondo { position: absolute; inset: 0; background: rgba(89, 75, 67, .55); backdrop-filter: blur(4px); animation: visor-fondo .35s ease both; }
+.visor-caja {
+  position: relative; display: grid; justify-items: center; gap: 14px; text-align: center;
+  background: radial-gradient(circle at 50% 46%, var(--turquesa) 0, var(--marfil) 62%); border-radius: 28px;
+  padding: 26px clamp(22px, 5vw, 44px) 22px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px);
+  box-shadow: 0 40px 80px -40px rgba(43, 36, 32, .8); animation: visor-entra .5s var(--lento) both;
+}
+.visor-caja h3 { font-size: clamp(26px, 3.4vw, 34px); max-width: 16ch; text-wrap: balance; }
+.visor-cerrar { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--linea); background: var(--hoja); color: var(--texto); font: 400 22px/1 var(--f-cuerpo); cursor: pointer; }
+.visor-cerrar:hover { border-color: var(--dorado); }
+.visor .telefono { position: relative; height: min(560px, calc(100vh - 210px)); height: min(560px, calc(100dvh - 210px)); aspect-ratio: 9 / 19.2; border-radius: 38px; background: #2B2420; padding: 9px; box-shadow: 0 30px 50px -28px rgba(89, 75, 67, .75); cursor: pointer; }
+.visor .telefono::before { content: ""; position: absolute; top: 15px; left: 50%; width: 58px; height: 7px; margin-left: -29px; border-radius: 999px; background: #2B2420; z-index: 2; }
+.visor .pantalla { width: 100%; height: 100%; border-radius: 30px; overflow: hidden; background: var(--marfil); }
+.visor .pantalla img { display: block; width: 100%; height: auto; max-width: none; will-change: transform; }
+.visor .pantalla img.sube { animation: subir var(--dur, 24s) ease-in-out infinite; }
+.visor.pausado .pantalla img.sube { animation-play-state: paused; }
+@keyframes subir {
+  0%, 7% { transform: translateY(0); opacity: 1; }
+  90% { transform: translateY(var(--dist, 0px)); opacity: 1; }
+  96% { transform: translateY(var(--dist, 0px)); opacity: 0; }
+  97% { transform: translateY(0); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes visor-entra { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes visor-fondo { from { opacity: 0; } to { opacity: 1; } }
+.visor-nota { font-size: 13px; color: var(--texto-suave); margin: 0; }
+body.visor-abierto { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .visor .pantalla { overflow-y: auto; } .visor .pantalla img.sube { animation: none; } }
+
+/* ---------- Versión física ---------- */
+.fisico { display: grid; gap: 12px; padding-top: 16px; border-top: 1px dashed var(--dorado-claro); font-size: 15px; }
+.fisico-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fisico-precio { font: 700 13px/1.2 var(--f-cuerpo); color: var(--dorado); }
+
+.evento-precio { font-weight: 700; color: var(--dorado); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .trazo { stroke-dashoffset: 0; }
+  .punto-final, .respira-texto span:first-child { opacity: 1; }
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a class="marca-chica" href="#inicio" data-ir="inicio" aria-label="Slumen, inicio">
+      <img src="img/nombre.png" alt="Slumen" width="372" height="92">
+    </a>
+    <button class="boton-menu" id="botonMenu" aria-expanded="false" aria-controls="menu">Menú <span aria-hidden="true">+</span></button>
+    <nav class="menu" id="menu" data-abierto="no" aria-label="Principal">
+      <a href="#mente" data-ir="mente">Mente</a>
+      <a href="#cuerpo" data-ir="cuerpo">Cuerpo</a>
+      <a href="#espiritu" data-ir="espiritu">Espíritu</a>
+      <span class="separador" aria-hidden="true"></span>
+      <a href="#aleja" data-ir="inicio" data-ancla="aleja">Aleja</a>
+      <a href="#test" data-ir="inicio" data-ancla="test">Test</a>
+      <a href="#encuentros" data-ir="inicio" data-ancla="encuentros">Encuentros</a>
+      <a class="boton boton--lleno boton--chico" href="#" data-enlace="inscripcion">Inscríbete</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- =================== INICIO =================== -->
+<div class="vista" data-vista="inicio">
+
+  <section class="banda--turquesa portada">
+
+    <div class="envoltura">
+      <img class="logo-grande" src="img/logo.png" alt="Slumen. Reconecta con tu ser." width="390" height="250">
+      <h1>Vuelve a ti.</h1>
+      <p class="bajada">Durante mucho tiempo intenté estar bien por partes: calmar la mente, cuidar el cuerpo, buscar a Dios… cada cosa por su lado. Un día entendí que todo va unido. Slumen es mi búsqueda de ese equilibrio entre mente, cuerpo y espíritu, y quiero recorrerla contigo.</p>
+      <div class="acciones">
+        <a class="boton boton--lleno" href="#test" data-ancla="test">Haz el test <span class="flecha" aria-hidden="true">↓</span></a>
+        <a class="boton boton--linea" href="#tres-ejes" data-ancla="tres-ejes">Conoce los tres ejes</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="cinta" aria-hidden="true">
+    <div class="cinta-pista">
+      <span>Respira</span><span>Suelta</span><span>Confía</span><span>Escucha</span><span>Descansa</span><span>Vuelve a ti</span>
+      <span>Respira</span><span>Suelta</span><span>Confía</span><span>Escucha</span><span>Descansa</span><span>Vuelve a ti</span>
+    </div>
+  </div>
+
+  <section class="banda banda--marfil" id="aleja">
+    <div class="envoltura aleja">
+      <img class="retrato-foto" src="img/aleja-retrato.jpg" alt="Aleja Correa, creadora de Slumen" width="640" height="800">
+      <div class="aleja-texto">
+        <span class="etiqueta">Detrás de Slumen</span>
+        <h2>Hola, soy Aleja.</h2>
+        <p>Soy María Alejandra Correa González, Aleja. Desde niña sentí más de lo que entendía: preguntas sobre Dios, sobre mi alma y sobre mi propia sensibilidad. Por años busqué respuestas en estudios profundos, hasta que entendí que lo más valioso era aprenderlo y compartirlo de una forma sencilla y cercana.</p>
+        <p>Slumen nació de ese camino. Está pensado en ti y en mí, con Dios como raíz. Te invito a caminar conmigo, a tu ritmo.</p>
+        <span class="firma">Aleja Correa</span>
+        <a class="enlace-aleja" href="#historia" data-ir="historia">Conoce más de Aleja <span class="flecha" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--lavanda" id="test">
+    <div class="envoltura test">
+      <div class="test-intro">
+        <span class="etiqueta">Test Slumen</span>
+        <h2>¿Por dónde empezar a volver a ti?</h2>
+        <p>Diez preguntas rápidas para notar dónde pide atención hoy tu mente, tu cuerpo o tu espíritu. Responde pensando en las últimas semanas, sin darle muchas vueltas. Al final te mostramos el eje de Slumen que más te puede acompañar.</p>
+        <p class="test-nota">Este test es una guía para empezar. No es un diagnóstico ni reemplaza el acompañamiento de un profesional de la salud.</p>
+      </div>
+      <div class="test-tarjeta" id="testTarjeta" data-no-i18n aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil" id="tres-ejes">
+    <div class="envoltura">
+      <div class="intro-ejes">
+        <span class="etiqueta">Los tres ejes de Slumen</span>
+        <h2>Tres caminos para un mismo regreso.</h2>
+        <p>Cada eje guarda sus propios recursos. Puedes empezar por el que hoy más te llame.</p>
+      </div>
+      <ul class="puertas">
+        <li>
+          <a class="puerta" href="#mente" data-ir="mente">
+            <span class="arco arco--mente" aria-hidden="true">
+              <svg viewBox="0 0 200 120"><path d="M14 70 C14 28, 72 26, 72 58 C72 82, 40 84, 40 62 C40 46, 58 40, 80 50 C110 64, 140 68, 186 56" fill="none" stroke="#594B43" stroke-width="5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="puerta-texto">
+              <h3>Mente</h3>
+              <p>Para salir de los bucles mentales y volver a pensar desde la calma.</p>
+            </span>
+            <span class="circulo-flecha" aria-hidden="true"><span class="flecha">→</span></span>
+          </a>
+        </li>
+        <li>
+          <a class="puerta" href="#cuerpo" data-ir="cuerpo">
+            <span class="arco arco--cuerpo" aria-hidden="true">
+              <svg viewBox="0 0 100 100"><circle class="respira" cx="50" cy="50" r="36" fill="none" stroke="#594B43" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#826643"/></svg>
+            </span>
+            <span class="puerta-texto">
+              <h3>Cuerpo</h3>
+              <p>Alimentación consciente, respiración, movimiento y cuidado del nervio vago.</p>
+            </span>
+            <span class="circulo-flecha" aria-hidden="true"><span class="flecha">→</span></span>
+          </a>
+        </li>
+        <li>
+          <a class="puerta" href="#espiritu" data-ir="espiritu">
+            <span class="arco arco--espiritu" aria-hidden="true">
+              <img src="img/sol.png" alt="" width="140" height="140">
+            </span>
+            <span class="puerta-texto">
+              <h3>Espíritu</h3>
+              <p>La fe como raíz: mensajes para cada día, gratitud y el arte de amarte para poder amar.</p>
+            </span>
+            <span class="circulo-flecha" aria-hidden="true"><span class="flecha">→</span></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="banda banda--turquesa" id="pack">
+    <div class="envoltura pack">
+      <div class="pack-texto">
+        <span class="etiqueta">Todo Slumen en un solo lugar</span>
+        <h2>Pack Vuelve a ti</h2>
+        <p>Los cinco recursos de los tres ejes, juntos, para caminar tu regreso completo: calmar la mente, habitar el cuerpo y descansar el espíritu.</p>
+      </div>
+      <div class="pack-lista">
+        <div><span>Mente</span><b>Método Slumen Mente</b></div>
+        <div><span>Cuerpo</span><b>Movimiento y respiración consciente</b></div>
+        <div><span>Cuerpo</span><b>Recetario Slumen 30 días</b></div>
+        <div><span>Espíritu</span><b>Slumen — Mensajes para volver a ti</b></div>
+        <div><span>Espíritu</span><b>Diario de Gratitud</b></div>
+        <div class="compra">
+          <span class="precio"><s>$314.900</s> $249.900 <small>Precio de lanzamiento · COP</small></span>
+          <a class="boton boton--lleno" href="#" data-enlace="pack">Comprar el pack <span class="flecha" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--rosa">
+    <div class="envoltura guia">
+      <div class="guia-texto">
+        <span class="gratis">Gratis</span>
+        <h2>Guía Vuelve a ti</h2>
+        <p>Un resumen de los tres ejes de Slumen con una práctica sencilla para cada uno: una para calmar la mente, una para habitar el cuerpo y una para descansar el espíritu. Para empezar hoy, sin prisa.</p>
+        <a class="boton boton--lleno" href="#" data-enlace="guiaGratis">Recibe la guía gratis <span class="flecha" aria-hidden="true">→</span></a>
+      </div>
+      <div class="cuadernillo" aria-hidden="true">
+        <div class="hoja h1"></div>
+        <div class="hoja h2"></div>
+        <div class="hoja h3">
+          <img src="img/sol.png" alt="" width="140" height="140">
+          <span class="t-guia">Vuelve<br>a ti</span>
+          <span class="ejes-guia"><span>Mente</span><span>Cuerpo</span><span>Espíritu</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil" id="encuentros">
+    <div class="envoltura">
+      <div class="encuentros-cabeza">
+        <span class="etiqueta">Para caminar en compañía</span>
+        <h2>Encuentros y acompañamiento</h2>
+        <p>Además de los tres ejes, hay espacios para vivir el proceso junto a otras personas o de forma personal.</p>
+      </div>
+      <div class="encuentros">
+        <article class="encuentro">
+          <h3>Próximos eventos</h3>
+          <div class="evento">
+            <span class="fecha">21 nov</span>
+            <div><strong>HABITARME · Lanzamiento de Slumen</strong><span>Sábado 21 de noviembre · 10:00 a. m. a 1:00 p. m. · Arkana Brunch, Envigado</span></div>
+          </div>
+          <p>Una mañana para volver a ti: recepción con coctel, mente, cuerpo, brunch saludable y meditación profunda. Nos acompañan Alma Vela Studio y Ritmo Lunar.</p>
+          <p class="evento-precio">Inversión: $170.000 COP · Cupos limitados</p>
+          <a class="boton boton--lleno boton--chico" href="#" data-enlace="eventos">Reserva tu cupo <span class="flecha" aria-hidden="true">→</span></a>
+        </article>
+        <article class="encuentro">
+          <h3>Acompañamiento 1 a 1</h3>
+          <p>Un espacio personal con Aleja para caminar tu proceso a tu ritmo: escuchar lo que te pasa, ordenar lo que pesa y encontrar tus propias prácticas para volver a ti.</p>
+          <a class="boton boton--linea boton--chico" href="#" data-enlace="acompanamiento">Pedir mi acompañamiento <span class="flecha" aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--turquesa" id="inscribete">
+    <div class="envoltura inscribete">
+      <span class="etiqueta">Quédate cerca</span>
+      <h2>Inscríbete</h2>
+      <p>Recibe descuentos, nuevos mensajes y las fechas de los próximos encuentros. Solo lo necesario, nada de ruido.</p>
+      <a class="boton boton--lleno" href="#" data-enlace="inscripcion">Inscribirme <span class="flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</div>
+
+<!-- =================== MENTE =================== -->
+<div class="vista" data-vista="mente" hidden>
+  <section class="eje-cabeza banda--lavanda">
+    <div class="envoltura">
+      <div>
+        <a class="volver" href="#inicio" data-ir="inicio"><span aria-hidden="true">←</span> Los tres ejes</a>
+        <span class="etiqueta" style="display:block">Eje 1 de 3</span>
+        <h1>Mente</h1>
+        <p class="bajada">Cuando la mente no para, todo se siente más pesado. Tus pensamientos no son tú. Aquí aprendes a notar el ruido, soltarlo con suavidad y volver a pensar desde la calma.</p>
+        <ul class="pilares"><li>Salir de los bucles mentales</li><li>Pensamientos conscientes</li><li>Calma</li></ul>
+      </div>
+      <div class="simbolo" aria-hidden="true">
+        <svg viewBox="0 0 200 140">
+          <path class="trazo" d="M14 80 C14 30, 78 28, 78 64 C78 92, 42 94, 42 70 C42 52, 62 46, 86 56 C118 70, 150 74, 190 60"/>
+          <circle class="punto-final" cx="190" cy="60" r="4"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura">
+      <div class="eleccion">
+        <div class="eleccion-cabeza"><span class="etiqueta">¿Por cuál empezar?</span><h2>Dos caminos dentro de Mente</h2></div>
+        <div class="eleccion-opciones">
+          <div class="opcion opcion--primera"><span class="opcion-cuando">Empieza aquí si…</span><h3>Método Slumen Mente</h3><p>una situación te mueve por dentro y tu mente entra en bucle. Te guía en seis pasos para transformar lo que sientes en ese momento y guardar tu recorrido.</p></div>
+          <div class="opcion"><span class="opcion-cuando">O elige esto si…</span><h3>Slumen Podcast</h3><p>quieres acompañarte con reflexiones, afirmaciones y oraciones mientras caminas, cocinas o descansas. Es gratis y es una forma suave de empezar a reconocer lo que piensas.</p></div>
+        </div>
+      </div>
+      <div class="productos-cabeza"><h2>Lo que encuentras en Mente</h2></div>
+      <div class="productos">
+        <article class="producto">
+          <button type="button" class="ver-dentro" data-recorrido="metodo"><span class="mini-cel" aria-hidden="true"></span>Así se ve por dentro</button>
+          <span class="tipo">Método · recorrido guiado</span>
+          <h3>Método Slumen Mente</h3>
+          <p class="frase">Transforma lo que estás sintiendo.</p>
+          <div style="display:grid;gap:14px;align-content:start">
+            <p>Cada vez que algo te mueve por dentro, puedes detenerte y recorrer seis pasos guiados. Tus pensamientos pueden llegar a ser tu mejor aliado.</p>
+            <ul class="pasos-mente"><li>Nombra</li><li>Identifica</li><li>Siéntela</li><li>Reconoce</li><li>Suelta</li><li>Sustituye</li></ul>
+            <p>Al final guardas tu recorrido y ves tu mes en «Mi transformación».</p>
+          </div>
+          <div class="compra">
+            <span class="precio"><s>$69.900</s> $49.900 <small>Precio de lanzamiento · COP</small></span>
+            <a class="boton boton--lleno" href="#" data-enlace="metodoMente">Comprar <span class="flecha" aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <article class="producto">
+          <button type="button" class="ver-dentro" data-recorrido="podcast"><span class="mini-cel" aria-hidden="true"></span>Así se ve por dentro</button>
+          <span class="tipo">Podcast</span>
+          <h3>Slumen Podcast</h3>
+          <p class="frase">Reconoce lo que piensas.</p>
+          <ul>
+            <li>Muchas ideas que hoy guían tu vida nacieron de experiencias y palabras de otro tiempo. Aquí aprendes a reconocerlas.</li>
+            <li>Reflexiones, afirmaciones y oraciones para cultivar pensamientos más conscientes.</li>
+            <li>Una relación más amorosa contigo, de la mano de Dios.</li>
+          </ul>
+          <div class="compra">
+            <span class="precio precio--gratis">Gratis</span>
+            <a class="boton boton--linea" href="#" data-enlace="podcast">Escuchar en Spotify <span class="flecha" aria-hidden="true">→</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--lavanda">
+    <div class="envoltura afirmacion">
+      <span class="etiqueta">Afirmación</span>
+      <blockquote>Hoy elijo observar mis pensamientos sin quedarme a vivir en ellos.</blockquote>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura siguiente">
+      <a class="volver" href="#inicio" data-ir="inicio"><span aria-hidden="true">←</span> Volver a los tres ejes</a>
+      <a class="grande" href="#cuerpo" data-ir="cuerpo">Sigue con Cuerpo <span class="circulo-flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</div>
+
+<!-- =================== CUERPO =================== -->
+<div class="vista" data-vista="cuerpo" hidden>
+  <section class="eje-cabeza banda--rosa">
+    <div class="envoltura">
+      <div>
+        <a class="volver" href="#inicio" data-ir="inicio"><span aria-hidden="true">←</span> Los tres ejes</a>
+        <span class="etiqueta" style="display:block">Eje 2 de 3</span>
+        <h1>Cuerpo</h1>
+        <p class="bajada">Tu cuerpo es el vehículo para volver a ti. Aquí aprendes a escucharlo a través de lo que comes, de cómo respiras y de cómo te mueves.</p>
+        <ul class="pilares"><li>Alimentación consciente</li><li>Meditación</li><li>Respiración</li><li>Movimiento consciente</li><li>Nervio vago</li></ul>
+      </div>
+      <div class="simbolo" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <circle class="respira" cx="100" cy="100" r="92" fill="#FFB3F7" opacity=".55"/>
+          <circle class="respira respira-2" cx="100" cy="100" r="70" fill="none" stroke="#594B43" stroke-width="1.2"/>
+        </svg>
+        <div class="respira-texto"><span>Inhala</span><span>Exhala</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura">
+      <div class="eleccion">
+        <div class="eleccion-cabeza"><span class="etiqueta">¿Por cuál empezar?</span><h2>Dos caminos dentro de Cuerpo</h2></div>
+        <div class="eleccion-opciones">
+          <div class="opcion opcion--primera"><span class="opcion-cuando">Empieza aquí si…</span><h3>Movimiento y respiración consciente</h3><p>sientes el cuerpo tenso, te cuesta descansar o vives con prisa. Respiras, te mueves y calmas tu nervio vago con prácticas guiadas.</p></div>
+          <div class="opcion"><span class="opcion-cuando">O elige esto si…</span><h3>Recetario Slumen 30 días</h3><p>lo que más te pide atención es la alimentación: comes rápido, sin hambre real o sin saber qué preparar. Te acompaña 30 días con recetas y porciones a tu medida.</p></div>
+        </div>
+      </div>
+      <div class="productos-cabeza"><h2>Lo que encuentras en Cuerpo</h2></div>
+      <div class="productos">
+        <article class="producto">
+          <button type="button" class="ver-dentro" data-recorrido="mov"><span class="mini-cel" aria-hidden="true"></span>Así se ve por dentro</button>
+          <span class="tipo">Práctica guiada</span>
+          <h3>Movimiento y respiración consciente</h3>
+          <p class="frase">Un cuerpo en calma le abre espacio a la mente y al espíritu.</p>
+          <ul>
+            <li><span><b>Respirar:</b> técnicas guiadas, incluida la respiración de fuego, con un círculo que marca el ritmo.</span></li>
+            <li><span><b>Mover:</b> movimiento consciente, de pies a cabeza.</span></li>
+            <li><span><b>Nervio vago:</b> ejercicios ilustrados para calmarlo y volver a la calma.</span></li>
+            <li><span><b>Descansar:</b> meditación para bajar el ritmo.</span></li>
+            <li><span><b>Mi práctica:</b> tu registro de cada día.</span></li>
+          </ul>
+          <div class="compra">
+            <span class="precio"><s>$79.900</s> $49.900 <small>Precio de lanzamiento · COP</small></span>
+            <a class="boton boton--lleno" href="#" data-enlace="movimiento">Comprar <span class="flecha" aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <article class="producto">
+          <button type="button" class="ver-dentro" data-recorrido="receta"><span class="mini-cel" aria-hidden="true"></span>Así se ve por dentro</button>
+          <span class="tipo">Recetario</span>
+          <h3>Recetario Slumen 30 días</h3>
+          <p class="frase">Comer también es una forma de volver a ti.</p>
+          <ul>
+            <li>30 días de desayuno, almuerzo y comida, con proteína y verduras en cada plato.</li>
+            <li>Una calculadora para armar tu plato según tu peso y tu ritmo, y guardar tus combinaciones.</li>
+            <li>Menú por semanas y recetas paso a paso, en español e inglés.</li>
+          </ul>
+          <div class="compra">
+            <span class="precio"><s>$54.900</s> $39.900 <small>Precio de lanzamiento · COP</small></span>
+            <a class="boton boton--lleno" href="#" data-enlace="recetario">Comprar <span class="flecha" aria-hidden="true">→</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--rosa">
+    <div class="envoltura afirmacion">
+      <span class="etiqueta">Afirmación</span>
+      <blockquote>Hoy escucho a mi cuerpo y le doy lo que necesita.</blockquote>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura siguiente">
+      <a class="volver" href="#inicio" data-ir="inicio"><span aria-hidden="true">←</span> Volver a los tres ejes</a>
+      <a class="grande" href="#espiritu" data-ir="espiritu">Sigue con Espíritu <span class="circulo-flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</div>
+
+<!-- =================== ESPÍRITU =================== -->
+<div class="vista" data-vista="espiritu" hidden>
+  <section class="eje-cabeza banda--turquesa">
+    <div class="envoltura">
+      <div>
+        <a class="volver" href="#inicio" data-ir="inicio"><span aria-hidden="true">←</span> Los tres ejes</a>
+        <span class="etiqueta" style="display:block">Eje 3 de 3</span>
+        <h1>Espíritu</h1>
+        <p class="bajada">La fe como raíz. Un lugar para descansar en Dios, o en esa energía creadora de todo, como tú la comprendas, y recordar que amarte es el primer paso para amar.</p>
+        <ul class="pilares"><li>Fe</li><li>Servicio</li><li>Amarte para poder amar</li></ul>
+      </div>
+      <div class="simbolo" aria-hidden="true">
+        <img class="sol-gira" src="img/sol.png" alt="" width="140" height="140">
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura">
+      <div class="eleccion">
+        <div class="eleccion-cabeza"><span class="etiqueta">¿Por cuál empezar?</span><h2>Dos caminos dentro de Espíritu</h2></div>
+        <div class="eleccion-opciones">
+          <div class="opcion opcion--primera"><span class="opcion-cuando">Empieza aquí si…</span><h3>Diario de Gratitud</h3><p>quieres una práctica diaria y profunda. Te acompaña 31 días con técnicas y métodos para conectar contigo y volver a la gratitud, a la fe y a la esperanza.</p></div>
+          <div class="opcion"><span class="opcion-cuando">O elige esto si…</span><h3>Slumen — Mensajes para volver a ti</h3><p>necesitas un mensaje que te centre hoy. Respiras, eliges tu carta y recibes una palabra de Dios que te acompaña durante el día.</p></div>
+        </div>
+      </div>
+      <div class="productos-cabeza"><h2>Lo que encuentras en Espíritu</h2></div>
+      <div class="productos">
+        <article class="producto">
+          <button type="button" class="ver-dentro" data-recorrido="diario"><span class="mini-cel" aria-hidden="true"></span>Así se ve por dentro</button>
+          <span class="tipo">Diario</span>
+          <h3>Diario de Gratitud</h3>
+          <p class="frase">Reconoce lo que sí está floreciendo.</p>
+          <ul>
+            <li>31 días para volver a ti, escuchar a Dios y reconocer lo que sí está floreciendo.</li>
+            <li>Cada día: un tema, una Palabra para meditar y tres momentos: Reflexiono, Exploro y escribo, y Lo llevo a mi vida.</li>
+            <li>Escribe a mano en tablet, colorea tu calendario de estado interno y descarga tu avance en PDF.</li>
+          </ul>
+          <div class="compra">
+            <span class="precio"><s>$79.900</s> $49.900 <small>Precio de lanzamiento · COP</small></span>
+            <a class="boton boton--lleno" href="#" data-enlace="diario">Comprar digital <span class="flecha" aria-hidden="true">→</span></a>
+          </div>
+          <div class="fisico">
+            <p><b>¿Lo prefieres físico?</b> También está impreso, para escribirlo a mano.</p>
+            <div class="fisico-fila"><span class="fisico-precio">Precio físico por confirmar</span><a class="boton boton--linea boton--chico" href="#" data-enlace="fisicoDiario">Pídelo por WhatsApp <span class="flecha" aria-hidden="true">→</span></a></div>
+          </div>
+        </article>
+        <article class="producto">
+          <button type="button" class="ver-dentro" data-recorrido="cartas"><span class="mini-cel" aria-hidden="true"></span>Así se ve por dentro</button>
+          <span class="tipo">Cartas digitales · Mensajes de Dios</span>
+          <h3>Slumen — Mensajes para volver a ti</h3>
+          <p class="frase">Una palabra para cada día.</p>
+          <ul>
+            <li>31 cartas con un mensaje de Dios para hoy.</li>
+            <li>Respiras y eliges tu carta, o buscas una por número o por palabra.</li>
+            <li>En el Libro de cada carta: reflexión, versículo y oración.</li>
+            <li>Una afirmación para llevar contigo.</li>
+          </ul>
+          <div class="compra">
+            <span class="precio"><s>$59.900</s> $37.900 <small>Precio de lanzamiento · COP</small></span>
+            <a class="boton boton--lleno" href="#" data-enlace="mensajes">Comprar digital <span class="flecha" aria-hidden="true">→</span></a>
+          </div>
+          <div class="fisico">
+            <p><b>¿Las prefieres físicas?</b> También están impresas, para tenerlas en tus manos.</p>
+            <div class="fisico-fila"><span class="fisico-precio">Precio físico por confirmar</span><a class="boton boton--linea boton--chico" href="#" data-enlace="fisicoMensajes">Pídelo por WhatsApp <span class="flecha" aria-hidden="true">→</span></a></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--turquesa">
+    <div class="envoltura afirmacion">
+      <span class="etiqueta">Afirmación</span>
+      <blockquote>Hoy confío en que lo que todavía no veo ya está siendo preparado para mí.</blockquote>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura siguiente">
+      <a class="volver" href="#inicio" data-ir="inicio"><span aria-hidden="true">←</span> Volver a los tres ejes</a>
+      <a class="grande" href="#mente" data-ir="mente">Vuelve a Mente <span class="circulo-flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</div>
+
+<!-- =================== HISTORIA DE ALEJA =================== -->
+<div class="vista" data-vista="historia" hidden>
+  <section class="banda banda--marfil historia-cabeza">
+    <div class="envoltura historia-intro">
+      <div class="historia-texto">
+        <a class="volver" href="#inicio" data-ir="inicio" data-ancla="aleja"><span aria-hidden="true">←</span> Volver al inicio</a>
+        <span class="etiqueta">Detrás de Slumen</span>
+        <h1>Mi camino de regreso</h1>
+        <p class="historia-bajada">Soy María Alejandra Correa González, Aleja. Esta es la historia de cómo aprendí a volver a mí, y de por qué hoy quiero caminar contigo.</p>
+      </div>
+      <img class="retrato-foto" src="img/aleja-retrato.jpg" alt="Aleja Correa, creadora de Slumen" width="640" height="800">
+    </div>
+  </section>
+
+  <section class="banda banda--marfil" style="padding-top:0">
+    <div class="envoltura">
+      <ol class="camino">
+        <li>
+          <span class="etiqueta">9 de febrero de 1996</span>
+          <h2>Una niña que sentía más</h2>
+          <p>Nací en una familia numerosa, donde las risas llenaban la casa. Me he reído desde muy pequeña y aprendí a buscar mi felicidad en medio de muchas situaciones. También fui siempre muy sensible, y muchas veces peleé con esa sensibilidad: sentía más, veía cosas y no las comprendía.</p>
+        </li>
+        <li>
+          <span class="etiqueta">Las preguntas del alma</span>
+          <h2>Lo que no sabía nombrar</h2>
+          <p>Desde pequeña aparecieron en mi vida temas espirituales a los que no les prestaba atención. No sabía quién era Dios ni quién era Jesús. No entendía mi alma, ni con quién hablaba cuando hablaba por dentro. Había tantas cosas que no entendía.</p>
+        </li>
+        <li>
+          <span class="etiqueta">Aprender y servir</span>
+          <h2>Un camino de estudio y de trabajo</h2>
+          <p>Estudié el bachillerato en la Javiera Londoño, en Medellín, una media técnica en el SENA, una tecnología en administración y luego Administración Comercial y de Mercadeo. Llevo 12 años en una organización maravillosa que amo profundamente. Siempre he pensado mucho en los demás.</p>
+        </li>
+        <li>
+          <span class="etiqueta">Volver a mí</span>
+          <h2>Bajar el ruido y escucharme</h2>
+          <p>Durante los últimos dos años he estudiado meditación, el cuerpo y el pensamiento, la mente consciente y la subconsciente, métodos de respiración y técnicas para volver a conectar conmigo y bajar el ruido mental.</p>
+        </li>
+        <li>
+          <span class="etiqueta">Por qué nació Slumen</span>
+          <h2>Compartir lo que me ayudó</h2>
+          <p>Muchas de las respuestas que buscaba solo las encontré en especializaciones y estudios muy profundos. Entendí que lo más importante era aprenderlo, sí, pero también compartirlo de una manera sencilla, cercana y a un costo más accesible, para que llegue a quien lo necesite.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="banda banda--turquesa">
+    <div class="envoltura afirmacion">
+      <blockquote>Todo esto está pensado en ti y en mí. Espero que podamos caminar juntos.</blockquote>
+      <span class="firma">Aleja Correa</span>
+    </div>
+  </section>
+
+  <section class="banda banda--marfil">
+    <div class="envoltura siguiente">
+      <a class="volver" href="#inicio" data-ir="inicio" data-ancla="aleja"><span aria-hidden="true">←</span> Volver al inicio</a>
+      <a class="grande" href="#test" data-ir="inicio" data-ancla="test">Haz el test <span class="circulo-flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<div class="visor" id="visor" hidden>
+  <div class="visor-fondo" data-cerrar></div>
+  <div class="visor-caja" role="dialog" aria-modal="true" aria-labelledby="visorTitulo">
+    <button type="button" class="visor-cerrar" data-cerrar aria-label="Cerrar">×</button>
+    <span class="etiqueta">Así se ve por dentro</span>
+    <h3 id="visorTitulo" data-no-i18n></h3>
+    <div class="telefono"><div class="pantalla"><img id="visorImg" alt="Vista del producto por dentro, desplazándose hacia arriba"></div></div>
+    <p class="visor-nota">Toca el celular para pausar</p>
+  </div>
+</div>
+
+<footer class="pie">
+  <div class="envoltura">
+    <span class="lema-pie">Reconecta con tu ser</span>
+    <nav aria-label="Pie de página">
+      <a href="#mente" data-ir="mente">Mente</a>
+      <a href="#cuerpo" data-ir="cuerpo">Cuerpo</a>
+      <a href="#espiritu" data-ir="espiritu">Espíritu</a>
+      <a href="#" data-enlace="podcast">Podcast</a>
+      <a href="#" data-enlace="instagram">Instagram</a>
+      <a href="#" data-enlace="inscripcion">Inscríbete</a>
+    </nav>
+    <small>Vuelve a ti.</small>
+  </div>
+</footer>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   ENLACES: pega aquí cada link cuando lo tengas.
+   Hotmart: el "link de pago" (checkout) de cada producto.
+   Google Forms: el link para compartir el formulario.
+   Mientras esté vacío, el botón muestra un aviso.
+   ============================================================ */
+const ENLACES = {
+  inscripcion:    { url: "", nombre: "el formulario de inscripción (Google Forms)" },
+  guiaGratis:     { url: "https://claude.ai/artifact/6WYthokvREgozjSBXVu4ch", nombre: "la guía gratuita" },
+  eventos:        { url: "https://claude.ai/artifact/5uVvPKTp2ZS6PXbb6znwX4", nombre: "los próximos eventos" },
+  acompanamiento: { url: "", nombre: "el acompañamiento 1 a 1" },
+  metodoMente:    { url: "https://claude.ai/artifact/A6nDQqebALMAJf2h6FyHW1", nombre: "pago en Hotmart del Método Slumen Mente" },
+  podcast:        { url: "https://open.spotify.com/show/50AMTYK2fhuNNf3PmzFLu0", nombre: "el podcast" },
+  movimiento:     { url: "https://claude.ai/artifact/CH9mz6cNNuduy1hm4YHNFc", nombre: "pago en Hotmart de Movimiento y respiración consciente" },
+  recetario:      { url: "https://claude.ai/artifact/X1BfNag3RZxhPc7P3uw5p1", nombre: "pago en Hotmart del Recetario" },
+  mensajes:       { url: "https://claude.ai/artifact/VFmNb3sYhEn66sNa6rrNZQ", nombre: "pago en Hotmart de Mensajes para volver a ti" },
+  diario:         { url: "https://claude.ai/artifact/SLncUdaJJnWSAQakgjzDNB", nombre: "pago en Hotmart del Diario de Gratitud" },
+  fisicoMensajes: { url: "", nombre: "WhatsApp para pedir las cartas físicas" },
+  fisicoDiario:   { url: "", nombre: "WhatsApp para pedir el diario físico" },
+  pack:           { url: "", nombre: "pago en Hotmart del Pack Vuelve a ti" },
+  instagram:      { url: "", nombre: "Instagram" }
+};
+
+const aviso = document.getElementById("aviso");
+let avisoTiempo;
+function mostrarAviso(texto) {
+  aviso.textContent = texto;
+  aviso.classList.add("visible");
+  clearTimeout(avisoTiempo);
+  avisoTiempo = setTimeout(() => aviso.classList.remove("visible"), 2800);
+}
+
+document.querySelectorAll("[data-enlace]").forEach(a => {
+  const datos = ENLACES[a.dataset.enlace];
+  if (datos && datos.url) {
+    a.href = datos.url;
+    a.target = "_blank";
+    a.rel = "noopener";
+  } else {
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      mostrarAviso((window.SLUMEN_I18N && SLUMEN_I18N.lang === "en") ? "This link is coming soon." : "Aquí irá el enlace de " + (datos ? datos.nombre : "este botón") + ".");
+    });
+  }
+});
+
+/* ---------- Vistas: inicio, mente, cuerpo, espíritu ---------- */
+const VISTAS = ["inicio", "mente", "cuerpo", "espiritu", "historia"];
+const ANCLAS = ["test", "tres-ejes", "pack", "aleja", "encuentros", "inscribete"];
+const menu = document.getElementById("menu");
+const botonMenu = document.getElementById("botonMenu");
+
+function cerrarMenu() {
+  menu.dataset.abierto = "no";
+  botonMenu.setAttribute("aria-expanded", "false");
+}
+botonMenu.addEventListener("click", () => {
+  const abierto = menu.dataset.abierto === "si";
+  menu.dataset.abierto = abierto ? "no" : "si";
+  botonMenu.setAttribute("aria-expanded", String(!abierto));
+});
+
+/* Salta directo a la sección (sin deslizar) y la hace aparecer suave */
+function irA(destino) {
+  destino.scrollIntoView({ behavior: "instant", block: "start" });
+  destino.classList.remove("aparece");
+  void destino.offsetWidth;
+  destino.classList.add("aparece");
+}
+
+function mostrarVista(nombre, ancla) {
+  if (!VISTAS.includes(nombre)) nombre = "inicio";
+  document.querySelectorAll("[data-vista]").forEach(v => {
+    const activa = v.dataset.vista === nombre;
+    if (activa && v.hidden) {
+      v.hidden = false;
+      v.style.animation = "none"; v.offsetHeight; v.style.animation = "";
+    } else if (!activa) {
+      v.hidden = true;
+    }
+  });
+  menu.querySelectorAll("[data-ir]").forEach(a => {
+    if (a.dataset.ir === nombre && !a.dataset.ancla) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+  cerrarMenu();
+  if (ancla) {
+    const destino = document.getElementById(ancla);
+    if (destino) requestAnimationFrame(() => irA(destino));
+  } else {
+    window.scrollTo({ top: 0 });
+  }
+}
+
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-ir], a[data-ancla]");
+  if (!a) return;
+  e.preventDefault();
+  const vista = a.dataset.ir || null;
+  const ancla = a.dataset.ancla || null;
+  if (vista) {
+    mostrarVista(vista, ancla);
+    try { history.replaceState(null, "", "#" + (ancla || vista)); } catch (_) {}
+  } else if (ancla) {
+    const destino = document.getElementById(ancla);
+    if (destino) irA(destino);
+  }
+});
+
+/* Abrir la vista que venga en el enlace (por ejemplo …#cuerpo) */
+const inicial = (location.hash || "").slice(1);
+if (VISTAS.includes(inicial)) mostrarVista(inicial);
+else if (ANCLAS.includes(inicial)) mostrarVista("inicio", inicial);
+window.addEventListener("hashchange", () => {
+  const h = location.hash.slice(1);
+  if (VISTAS.includes(h)) mostrarVista(h);
+});
+</script>
+
+<style>
+/* Selector de idioma dentro del encabezado */
+.cabecera .envoltura { justify-content: flex-start; }
+.cabecera .marca-chica { margin-right: auto; }
+.cabecera .ls-sw.ls-in { margin-left: 14px; flex: none; background: var(--marfil); }
+.cabecera .boton-menu { margin-left: 14px; }
+@media (max-width: 820px) { .cabecera .ls-sw.ls-in { margin-left: 10px; } .cabecera .ls-sw button { min-width: 38px; padding: 0 9px; } }
+@media (max-width: 420px) { .cabecera .envoltura { gap: 8px; } .cabecera .marca-chica img { height: 28px; } .cabecera .boton-menu { margin-left: 0; padding: 9px 12px; } .cabecera .ls-sw.ls-in { margin-left: 0; } .cabecera .ls-sw button { min-width: 34px; padding: 0 8px; } }
+</style>
+<style>
+/* Selector de idioma ES | EN */
+:root{--ls-bg:rgba(255,253,249,.92);--ls-fg:#594b43;--ls-line:rgba(89,75,67,.3);--ls-on:#826643;--ls-on-fg:#fffdf9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ls-bg:rgba(42,36,32,.92);--ls-fg:#f1e8dc;--ls-line:rgba(241,232,220,.3);--ls-on:#d9b98a;--ls-on-fg:#2a2420}}
+:root[data-theme="dark"]{--ls-bg:rgba(42,36,32,.92);--ls-fg:#f1e8dc;--ls-line:rgba(241,232,220,.3);--ls-on:#d9b98a;--ls-on-fg:#2a2420}
+.ls-sw{position:fixed;z-index:60;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(12px,calc(env(safe-area-inset-right,0px) + 12px));display:inline-flex;gap:2px;padding:3px;border:1px solid var(--ls-line);border-radius:999px;background:var(--ls-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ls-sw.ls-in{position:static;margin-left:auto;width:max-content;backdrop-filter:none;-webkit-backdrop-filter:none}
+.ls-sw button{min-height:36px;min-width:44px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--ls-fg);font:700 .8rem/1 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.1em;cursor:pointer}
+.ls-sw button[aria-pressed="true"]{background:var(--ls-on);color:var(--ls-on-fg)}
+.ls-sw button:focus-visible{outline:2px solid var(--ls-fg);outline-offset:2px}
+@media print{.ls-sw{display:none!important}}
+</style>
+<script>
+(function () {
+"use strict";
+var EN = {"__title__": "Slumen", "Vista de prueba: los botones de Comprar abren tus productos como si ya se hubieran pagado.": "Test view: the Buy buttons open your products as if they had already been paid for.", "@Slumen, inicio": "Slumen, home", "Menú <span aria-hidden=\"true\">+<\/span>": "Menu <span aria-hidden=\"true\">+<\/span>", "@Principal": "Main", "Mente": "Mind", "Cuerpo": "Body", "Espíritu": "Spirit", "Encuentros": "Gatherings", "Inscríbete": "Sign up", "@Slumen. Reconecta con tu ser.": "Slumen. Reconnect with your being.", "Vuelve a ti.": "Return to yourself.", "Un espacio para quienes llegan cansados, con la mente llena de ruido o con ganas de soltar. Aquí se camina despacio, desde la mente, el cuerpo y el espíritu.": "A space for those who arrive tired, with a mind full of noise or a wish to let go. Here we walk slowly, from the mind, the body and the spirit.", "Elige por dónde empezar <span class=\"flecha\" aria-hidden=\"true\">↓<\/span>": "Choose where to begin <span class=\"flecha\" aria-hidden=\"true\">↓<\/span>", "Respira": "Breathe", "Suelta": "Let go", "Confía": "Trust", "Escucha": "Listen", "Descansa": "Rest", "Vuelve a ti": "Return to yourself", "Los tres ejes de Slumen": "The three paths of Slumen", "Tres caminos para un mismo regreso.": "Three paths for the same return.", "Cada eje guarda sus propios recursos. Puedes empezar por el que hoy más te llame.": "Each path holds its own resources. You can begin with the one that calls you most today.", "Para salir de los bucles mentales y volver a pensar desde la calma.": "To get out of mental loops and think again from a place of calm.", "Alimentación consciente, respiración, movimiento y cuidado del nervio vago.": "Mindful eating, breathing, movement and care of the vagus nerve.", "La fe como raíz: mensajes para cada día, gratitud y el arte de amarte para poder amar.": "Faith as a root: messages for each day, gratitude and the art of loving yourself in order to love.", "Todo Slumen en un solo lugar": "All of Slumen in one place", "Pack Vuelve a ti": "Return to Yourself Pack", "Los cinco recursos de los tres ejes, juntos, para caminar tu regreso completo: calmar la mente, habitar el cuerpo y descansar el espíritu.": "The five resources from the three paths, together, to walk your complete return: calm the mind, inhabit the body and rest the spirit.", "Método Slumen Mente": "Slumen Mind Method", "Movimiento y respiración consciente": "Mindful Movement and Breathing", "Recetario Slumen 30 días": "Slumen 30-Day Recipe Book", "Slumen — Mensajes para volver a ti": "Slumen — Messages to Return to Yourself", "Diario de Gratitud": "Gratitude Journal", "Comprar el pack <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Buy the pack <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Gratis": "Free", "Guía Vuelve a ti": "Return to Yourself Guide", "Un resumen de los tres ejes de Slumen con una práctica sencilla para cada uno: una para calmar la mente, una para habitar el cuerpo y una para descansar el espíritu. Para empezar hoy, sin prisa.": "A summary of Slumen’s three paths with a simple practice for each: one to calm the mind, one to inhabit the body and one to rest the spirit. To start today, without hurry.", "Recibe la guía gratis <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Get the free guide <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Vuelve<br>a ti": "Return<br>to yourself", "@Aleja Correa, creadora de Slumen": "Aleja Correa, creator of Slumen", "Detrás de Slumen": "Behind Slumen", "Hola, soy Aleja.": "Hi, I’m Aleja.", "Slumen nació de mi propio camino de regreso. Hubo un tiempo en que mi mente no paraba y mi cuerpo me pedía una pausa que yo no sabía darle. Aprendí, despacio, que volver a mí no era hacer más, sino detenerme, escuchar y confiar.": "Slumen was born from my own way back. There was a time when my mind wouldn’t stop and my body was asking for a pause I didn’t know how to give it. Slowly I learned that returning to myself wasn’t about doing more, but about stopping, listening and trusting.", "Hoy comparto lo que me ayudó: prácticas para la mente, el cuerpo y el espíritu, con Dios como raíz. No vengo a enseñarte desde arriba; te invito a caminar conmigo, a tu ritmo.": "Today I share what helped me: practices for the mind, the body and the spirit, with God as a root. I’m not here to teach you from above; I invite you to walk with me, at your own pace.", "Para caminar en compañía": "To walk in company", "Encuentros y acompañamiento": "Gatherings and one-to-one support", "Además de los tres ejes, hay espacios para vivir el proceso junto a otras personas o de forma personal.": "Besides the three paths, there are spaces to live the process alongside other people or on a personal basis.", "Próximos eventos": "Upcoming events", "Pronto": "Soon", "HABITARME · taller": "HABITARME · workshop", "Fecha y lugar por anunciar": "Date and place to be announced", "Quiero saber las fechas <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "I want to know the dates <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Acompañamiento 1 a 1": "One-to-one support", "Un espacio personal con Aleja para caminar tu proceso a tu ritmo: escuchar lo que te pasa, ordenar lo que pesa y encontrar tus propias prácticas para volver a ti.": "A personal space with Aleja to walk your process at your own pace: listen to what is happening to you, put in order what weighs on you and find your own practices to return to yourself.", "Pedir mi acompañamiento <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Request my support <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Quédate cerca": "Stay close", "Recibe descuentos, nuevos mensajes y las fechas de los próximos encuentros. Solo lo necesario, nada de ruido.": "Receive discounts, new messages and the dates of upcoming gatherings. Only what’s necessary, no noise.", "Inscribirme <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Sign me up <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "<span aria-hidden=\"true\">←<\/span> Los tres ejes": "<span aria-hidden=\"true\">←<\/span> The three paths", "Eje 1 de 3": "Path 1 of 3", "Cuando la mente no para, todo se siente más pesado. Tus pensamientos no son tú. Aquí aprendes a notar el ruido, soltarlo con suavidad y volver a pensar desde la calma.": "When the mind won’t stop, everything feels heavier. Your thoughts are not you. Here you learn to notice the noise, let it go gently and think again from a place of calm.", "Salir de los bucles mentales": "Getting out of mental loops", "Pensamientos conscientes": "Conscious thoughts", "Calma": "Calm", "Lo que encuentras en Mente": "What you’ll find in Mind", "Método · recorrido guiado": "Method · guided journey", "Transforma lo que estás sintiendo.": "Transform what you are feeling.", "Cada vez que algo te mueve por dentro, puedes detenerte y recorrer seis pasos, con una pausa para respirar y una afirmación al final.": "Every time something moves you inside, you can stop and go through six steps, with a pause to breathe and an affirmation at the end.", "Nombra": "Name", "Identifica": "Identify", "Siéntela": "Feel it", "Reconoce": "Recognize", "Sustituye": "Replace", "Comprar <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Buy <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Slumen Podcast": "Slumen Podcast", "Reconoce lo que piensas.": "Recognize what you think.", "Muchas ideas que hoy guían tu vida nacieron de experiencias y palabras de otro tiempo. Aquí aprendes a reconocerlas.": "Many ideas that guide your life today were born from experiences and words of another time. Here you learn to recognize them.", "Reflexiones, afirmaciones y oraciones para cultivar pensamientos más conscientes.": "Reflections, affirmations and prayers to cultivate more conscious thoughts.", "Una relación más amorosa contigo, de la mano de Dios.": "A more loving relationship with yourself, hand in hand with God.", "Escuchar en Spotify <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Listen on Spotify <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Afirmación": "Affirmation", "Hoy elijo observar mis pensamientos sin quedarme a vivir en ellos.": "Today I choose to observe my thoughts without moving in to live inside them.", "<span aria-hidden=\"true\">←<\/span> Volver a los tres ejes": "<span aria-hidden=\"true\">←<\/span> Back to the three paths", "Sigue con Cuerpo <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>": "Continue with Body <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>", "Eje 2 de 3": "Path 2 of 3", "Tu cuerpo es el vehículo para volver a ti. Aquí aprendes a escucharlo a través de lo que comes, de cómo respiras y de cómo te mueves.": "Your body is the vehicle to return to yourself. Here you learn to listen to it through what you eat, how you breathe and how you move.", "Alimentación consciente": "Mindful eating", "Meditación": "Meditation", "Respiración": "Breathing", "Movimiento consciente": "Mindful movement", "Nervio vago": "Vagus nerve", "Inhala": "Inhale", "Exhala": "Exhale", "Lo que encuentras en Cuerpo": "What you’ll find in Body", "Práctica guiada": "Guided practice", "Un cuerpo en calma le abre espacio a la mente y al espíritu.": "A calm body opens space for the mind and the spirit.", "<b>Respirar:<\/b> técnicas guiadas, incluida la respiración de fuego, con un círculo que marca el ritmo.": "<b>Breathe:<\/b> guided techniques, including breath of fire, with a circle that sets the rhythm.", "<b>Mover:<\/b> movimiento consciente, de pies a cabeza.": "<b>Move:<\/b> mindful movement, from feet to head.", "<b>Descansar:<\/b> meditación y prácticas para calmar el nervio vago.": "<b>Rest:<\/b> meditation and practices to calm the vagus nerve.", "<b>Mi práctica:<\/b> tu registro de cada día.": "<b>My practice:<\/b> your record of each day.", "Recetario": "Recipe Book", "Comer también es una forma de volver a ti.": "Eating is also a way of returning to yourself.", "30 días de desayuno, almuerzo y comida, con proteína y verduras en cada plato.": "30 days of breakfast, lunch and dinner, with protein and vegetables on every plate.", "Una guía de porciones con calculadora para ajustar cada receta a tu cuerpo.": "A portion guide with a calculator to adjust each recipe to your body.", "Ideas para cuidar tu microbiota y comer despacio, con presencia.": "Ideas to care for your microbiota and eat slowly, with presence.", "Hoy escucho a mi cuerpo y le doy lo que necesita.": "Today I listen to my body and give it what it needs.", "Sigue con Espíritu <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>": "Continue with Spirit <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>", "Eje 3 de 3": "Path 3 of 3", "La fe como raíz. Un lugar para descansar en Dios, o en esa energía creadora de todo, como tú la comprendas, y recordar que amarte es el primer paso para amar.": "Faith as a root. A place to rest in God, or in that creative energy behind all things, however you understand it, and to remember that loving yourself is the first step to loving.", "Fe": "Faith", "Servicio": "Service", "Amarte para poder amar": "Loving yourself in order to love", "Lo que encuentras en Espíritu": "What you’ll find in Spirit", "Cartas digitales · Mensajes de Dios": "Digital cards · Messages from God", "Una palabra para cada día.": "A word for each day.", "Un mensaje de Dios, escrito para ti.": "A message from God, written for you.", "Un principio bíblico que lo sostiene.": "A Bible principle that holds it up.", "Una oración para cerrar el día en paz.": "A prayer to close the day in peace.", "Una afirmación para llevar contigo.": "An affirmation to carry with you.", "Diario": "Journal", "Reconoce lo que sí está floreciendo.": "Recognize what is blooming.", "31 días para volver a ti y escuchar a Dios.": "31 days to return to yourself and listen to God.", "Cada día en tres momentos: Reflexiono, Exploro y escribo, y Lo llevo a mi vida.": "Each day in three moments: I reflect, I explore and write, and I take it into my life.", "Para escribir a mano en tablet o imprimir en PDF.": "To write by hand on a tablet or print as a PDF.", "Hoy confío en que lo que todavía no veo ya está siendo preparado para mí.": "Today I trust that what I can’t yet see is already being prepared for me.", "Vuelve a Mente <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>": "Back to Mind <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>", "Reconecta con tu ser": "Reconnect with your being", "@Pie de página": "Footer", "<s>$314.900<\/s> $249.900 <small>Precio de lanzamiento · COP<\/small>": "<s>US$99.99<\/s> US$79.99 <small>Launch price · USD<\/small>", "<s>$69.900<\/s> $49.900 <small>Precio de lanzamiento · COP<\/small>": "<s>US$21.99<\/s> US$15.99 <small>Launch price · USD<\/small>", "<s>$79.900<\/s> $49.900 <small>Precio de lanzamiento · COP<\/small>": "<s>US$24.99<\/s> US$15.99 <small>Launch price · USD<\/small>", "<s>$54.900<\/s> $39.900 <small>Precio de lanzamiento · COP<\/small>": "<s>US$17.99<\/s> US$12.99 <small>Launch price · USD<\/small>", "<s>$59.900<\/s> $37.900 <small>Precio de lanzamiento · COP<\/small>": "<s>US$18.99<\/s> US$11.99 <small>Launch price · USD<\/small>", "Haz el test <span class=\"flecha\" aria-hidden=\"true\">↓<\/span>": "Take the test <span class=\"flecha\" aria-hidden=\"true\">↓<\/span>", "Conoce los tres ejes": "Discover the three paths", "Test Slumen": "Slumen test", "¿Por dónde empezar a volver a ti?": "Where to begin returning to yourself?", "Diez preguntas rápidas para notar dónde pide atención hoy tu mente, tu cuerpo o tu espíritu. Responde pensando en las últimas semanas, sin darle muchas vueltas. Al final te mostramos el eje de Slumen que más te puede acompañar.": "Ten quick questions to notice where your mind, body or spirit is asking for attention today. Answer thinking about the last few weeks, without overthinking it. At the end we show you the Slumen path that can support you most.", "Este test es una guía para empezar. No es un diagnóstico ni reemplaza el acompañamiento de un profesional de la salud.": "This test is a guide to get started. It is not a diagnosis and does not replace support from a health professional.", "21 nov": "Nov 21", "HABITARME · Lanzamiento de Slumen": "HABITARME · Slumen launch", "Sábado 21 de noviembre · 10:00 a. m. a 1:00 p. m. · Arkana Brunch, Envigado": "Saturday, November 21 · 10:00 a.m. to 1:00 p.m. · Arkana Brunch, Envigado", "Una mañana para volver a ti: recepción con coctel, mente, cuerpo, brunch saludable y meditación profunda. Nos acompañan Alma Vela Studio y Ritmo Lunar.": "A morning to return to yourself: welcome cocktail, mind, body, a healthy brunch and deep meditation. With Alma Vela Studio and Ritmo Lunar.", "Inversión: $170.000 COP · Cupos limitados": "Investment: COP 170,000 · Limited spots", "Reserva tu cupo <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Book your spot <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Cada vez que algo te mueve por dentro, puedes detenerte y recorrer seis pasos guiados. Tus pensamientos pueden llegar a ser tu mejor aliado.": "Every time something moves you inside, you can stop and go through six guided steps. Your thoughts can become your best ally.", "Al final guardas tu recorrido y ves tu mes en «Mi transformación».": "At the end you save your journey and see your month in “My transformation”.", "<b>Nervio vago:<\/b> ejercicios ilustrados para calmarlo y volver a la calma.": "<b>Vagus nerve:<\/b> illustrated exercises to soothe it and return to calm.", "<b>Descansar:<\/b> meditación para bajar el ritmo.": "<b>Rest:<\/b> meditation to slow down.", "Una calculadora para armar tu plato según tu peso y tu ritmo, y guardar tus combinaciones.": "A calculator to build your plate for your weight and pace, and save your combinations.", "Menú por semanas y recetas paso a paso, en español e inglés.": "A week-by-week menu and step-by-step recipes, in Spanish and English.", "31 cartas con un mensaje de Dios para hoy.": "31 cards with a message from God for today.", "Respiras y eliges tu carta, o buscas una por número o por palabra.": "You breathe and choose your card, or look one up by number or word.", "En el Libro de cada carta: reflexión, versículo y oración.": "In each card’s Book: a reflection, a Bible verse and a prayer.", "31 días para volver a ti, escuchar a Dios y reconocer lo que sí está floreciendo.": "31 days to return to yourself, listen to God and recognize what is blooming.", "Cada día: un tema, una Palabra para meditar y tres momentos: Reflexiono, Exploro y escribo, y Lo llevo a mi vida.": "Each day: a theme, a Word to meditate on and three moments: I reflect, I explore and write, and I take it into my life.", "Escribe a mano en tablet, colorea tu calendario de estado interno y descarga tu avance en PDF.": "Write by hand on a tablet, color your inner-state calendar and download your progress as a PDF."
+, "Soy María Alejandra Correa González, Aleja. Desde niña sentí más de lo que entendía: preguntas sobre Dios, sobre mi alma y sobre mi propia sensibilidad. Por años busqué respuestas en estudios profundos, hasta que entendí que lo más valioso era aprenderlo y compartirlo de una forma sencilla y cercana.": "I’m María Alejandra Correa González, Aleja. Since I was a child I felt more than I understood: questions about God, about my soul and about my own sensitivity. For years I looked for answers in deep studies, until I understood that the most valuable thing was to learn it and share it in a simple, close way.", "Slumen nació de ese camino. Está pensado en ti y en mí, con Dios como raíz. Te invito a caminar conmigo, a tu ritmo.": "Slumen was born from that path. It is made with you and me in mind, with God as a root. I invite you to walk with me, at your own pace.", "Conoce más de Aleja <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Learn more about Aleja <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "<span aria-hidden=\"true\">←<\/span> Volver al inicio": "<span aria-hidden=\"true\">←<\/span> Back to home", "Mi camino de regreso": "My way back", "Soy María Alejandra Correa González, Aleja. Esta es la historia de cómo aprendí a volver a mí, y de por qué hoy quiero caminar contigo.": "I’m María Alejandra Correa González, Aleja. This is the story of how I learned to return to myself, and why today I want to walk with you.", "9 de febrero de 1996": "February 9, 1996", "Una niña que sentía más": "A girl who felt more", "Nací en una familia numerosa, donde las risas llenaban la casa. Me he reído desde muy pequeña y aprendí a buscar mi felicidad en medio de muchas situaciones. También fui siempre muy sensible, y muchas veces peleé con esa sensibilidad: sentía más, veía cosas y no las comprendía.": "I was born into a big family, where laughter filled the house. I have laughed since I was very little, and I learned to look for my happiness in the middle of many situations. I was also always very sensitive, and I often fought with that sensitivity: I felt more, I saw things and I didn’t understand them.", "Las preguntas del alma": "The soul’s questions", "Lo que no sabía nombrar": "What I couldn’t name", "Desde pequeña aparecieron en mi vida temas espirituales a los que no les prestaba atención. No sabía quién era Dios ni quién era Jesús. No entendía mi alma, ni con quién hablaba cuando hablaba por dentro. Había tantas cosas que no entendía.": "Since I was little, spiritual things appeared in my life that I didn’t pay attention to. I didn’t know who God was or who Jesus was. I didn’t understand my soul, or who I was talking to when I spoke inside. There were so many things I didn’t understand.", "Aprender y servir": "Learning and serving", "Un camino de estudio y de trabajo": "A path of study and work", "Estudié el bachillerato en la Javiera Londoño, en Medellín, una media técnica en el SENA, una tecnología en administración y luego Administración Comercial y de Mercadeo. Llevo 12 años en una organización maravillosa que amo profundamente. Siempre he pensado mucho en los demás.": "I went to high school at Javiera Londoño in Medellín, did a technical program at SENA, a technology degree in administration and then a degree in Business and Marketing Administration. I have spent 12 years in a wonderful organization that I love deeply. I have always thought a lot about others.", "Volver a mí": "Returning to myself", "Bajar el ruido y escucharme": "Quieting the noise and listening to myself", "Durante los últimos dos años he estudiado meditación, el cuerpo y el pensamiento, la mente consciente y la subconsciente, métodos de respiración y técnicas para volver a conectar conmigo y bajar el ruido mental.": "Over the last two years I have studied meditation, the body and thought, the conscious and subconscious mind, breathing methods and techniques to reconnect with myself and quiet mental noise.", "Por qué nació Slumen": "Why Slumen was born", "Compartir lo que me ayudó": "Sharing what helped me", "Muchas de las respuestas que buscaba solo las encontré en especializaciones y estudios muy profundos. Entendí que lo más importante era aprenderlo, sí, pero también compartirlo de una manera sencilla, cercana y a un costo más accesible, para que llegue a quien lo necesite.": "Many of the answers I was looking for I only found in specializations and very deep studies. I understood that the most important thing was to learn it, yes, but also to share it in a simple, close way and at a more accessible cost, so it reaches whoever needs it.", "Todo esto está pensado en ti y en mí. Espero que podamos caminar juntos.": "All of this is made with you and me in mind. I hope we can walk together.", "Haz el test <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>": "Take the test <span class=\"circulo-flecha\" aria-hidden=\"true\">→<\/span>"
+, "¿Por cuál empezar?": "Where to start?", "Dos caminos dentro de Mente": "Two paths within Mind", "Dos caminos dentro de Cuerpo": "Two paths within Body", "Dos caminos dentro de Espíritu": "Two paths within Spirit", "Empieza aquí si…": "Start here if…", "O elige esto si…": "Or choose this if…", "una situación te mueve por dentro y tu mente entra en bucle. Te guía en seis pasos para transformar lo que sientes en ese momento y guardar tu recorrido.": "a situation moves you inside and your mind goes into a loop. It guides you through six steps to transform what you feel in that moment and save your journey.", "quieres acompañarte con reflexiones, afirmaciones y oraciones mientras caminas, cocinas o descansas. Es gratis y es una forma suave de empezar a reconocer lo que piensas.": "you want reflections, affirmations and prayers to keep you company while you walk, cook or rest. It’s free and a gentle way to start recognizing what you think.", "sientes el cuerpo tenso, te cuesta descansar o vives con prisa. Respiras, te mueves y calmas tu nervio vago con prácticas guiadas.": "your body feels tense, it’s hard to rest or you live in a hurry. You breathe, move and calm your vagus nerve with guided practices.", "lo que más te pide atención es la alimentación: comes rápido, sin hambre real o sin saber qué preparar. Te acompaña 30 días con recetas y porciones a tu medida.": "what needs your attention most is food: you eat fast, without real hunger or without knowing what to cook. It supports you for 30 days with recipes and portions made for you.", "quieres una práctica diaria y profunda. Te acompaña 31 días con técnicas y métodos para conectar contigo y volver a la gratitud, a la fe y a la esperanza.": "you want a deep daily practice. It supports you for 31 days with techniques and methods to connect with yourself and return to gratitude, faith and hope.", "necesitas un mensaje que te centre hoy. Respiras, eliges tu carta y recibes una palabra de Dios que te acompaña durante el día.": "you need a message to center you today. You breathe, choose your card and receive a word from God that stays with you through the day."
+, "Así se ve por dentro": "A look inside", "Comprar digital <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Buy digital <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "<b>¿Las prefieres físicas?<\/b> También están impresas, para tenerlas en tus manos.": "<b>Prefer them printed?<\/b> They also come printed, so you can hold them in your hands.", "<b>¿Lo prefieres físico?<\/b> También está impreso, para escribirlo a mano.": "<b>Prefer it printed?<\/b> It also comes printed, so you can write in it by hand.", "Precio físico por confirmar": "Printed price to be confirmed", "Pídelo por WhatsApp <span class=\"flecha\" aria-hidden=\"true\">→<\/span>": "Order on WhatsApp <span class=\"flecha\" aria-hidden=\"true\">→<\/span>", "Durante mucho tiempo intenté estar bien por partes: calmar la mente, cuidar el cuerpo, buscar a Dios… cada cosa por su lado. Un día entendí que todo va unido. Slumen es mi búsqueda de ese equilibrio entre mente, cuerpo y espíritu, y quiero recorrerla contigo.": "For a long time I tried to be well in pieces: calming my mind, caring for my body, looking for God… each thing on its own. One day I understood that it all goes together. Slumen is my search for that balance between mind, body and spirit, and I want to walk it with you.", "<span class=\"mini-cel\" aria-hidden=\"true\"><\/span>Así se ve por dentro": "<span class=\"mini-cel\" aria-hidden=\"true\"><\/span>A look inside", "Toca el celular para pausar": "Tap the phone to pause", "@Cerrar": "Close", "@Vista del producto por dentro, desplazándose hacia arriba": "View inside the product, scrolling up"};
+var OPTS = {"mount": ".cabecera .envoltura", "mountFirst": false};
+var KEY = "slumen-lang";
+var INLINE = { A: 1, B: 1, STRONG: 1, EM: 1, I: 1, SPAN: 1, BR: 1, SMALL: 1, SUP: 1, SUB: 1, U: 1, MARK: 1, CODE: 1, ABBR: 1, CITE: 1, TIME: 1, WBR: 1, S: 1 };
+var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEXTAREA: 1, CANVAS: 1, TEMPLATE: 1, TITLE: 1, LINK: 1, META: 1 };
+var ATTRS = ["placeholder", "aria-label", "title", "alt"];
+var lang = "es";
+var recEl = new Map(), recTx = new Map(), recAt = new Map();
+var obs = null, collecting = null;
+
+function norm(s) { return String(s).replace(/\s+/g, " ").trim(); }
+function inlineOnly(el) {
+  for (var i = 0; i < el.children.length; i++) {
+    var c = el.children[i];
+    if (!INLINE[c.tagName] || !inlineOnly(c)) return false;
+  }
+  return true;
+}
+function hasText(el) {
+  for (var n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.nodeValue.trim()) return true;
+  return false;
+}
+function isUnit(el) { return hasText(el) && inlineOnly(el); }
+function look(key) {
+  if (collecting) { if (collecting.keys.indexOf(key) < 0) collecting.keys.push(key); return null; }
+  return Object.prototype.hasOwnProperty.call(EN, key) ? EN[key] : null;
+}
+
+function setEl(el, html) {
+  if (!recEl.has(el)) recEl.set(el, { o: el.innerHTML, e: null });
+  el.innerHTML = html;
+  recEl.get(el).e = el.innerHTML;
+}
+function attrs(el) {
+  for (var i = 0; i < ATTRS.length; i++) {
+    var a = ATTRS[i];
+    if (!el.hasAttribute || !el.hasAttribute(a)) continue;
+    var v = el.getAttribute(a), k = norm(v);
+    if (!k) continue;
+    var t = look("@" + k);
+    if (t == null) continue;
+    var r = recAt.get(el) || {};
+    if (!r[a]) r[a] = { o: v, e: t };
+    recAt.set(el, r);
+    el.setAttribute(a, t);
+  }
+}
+function walk(el) {
+  if (el.nodeType !== 1) return;
+  if (SKIP[el.tagName] && el.tagName !== "TEXTAREA") return;
+  if (el.closest && el.closest("[data-no-i18n]")) return;
+  attrs(el);
+  if (el.tagName === "TEXTAREA") return;
+  if (isUnit(el)) {
+    var t = look(norm(el.innerHTML));
+    if (t != null) { setEl(el, t); return; }
+    if (collecting) return;
+  }
+  for (var n = el.firstChild; n; n = n.nextSibling) {
+    if (n.nodeType === 1) walk(n);
+    else if (n.nodeType === 3 && n.nodeValue.trim()) {
+      var tt = look(norm(n.nodeValue));
+      if (tt != null) {
+        var lead = /^\s*/.exec(n.nodeValue)[0], trail = /\s*$/.exec(n.nodeValue)[0];
+        if (!recTx.has(n)) recTx.set(n, { o: n.nodeValue, e: null });
+        n.nodeValue = lead + tt + trail;
+        recTx.get(n).e = n.nodeValue;
+      }
+    }
+  }
+}
+function restore() {
+  recEl.forEach(function (r, el) { if (el.innerHTML === r.e) el.innerHTML = r.o; });
+  recTx.forEach(function (r, n) { if (n.nodeValue === r.e) n.nodeValue = r.o; });
+  recAt.forEach(function (r, el) {
+    for (var a in r) if (el.getAttribute(a) === r[a].e) el.setAttribute(a, r[a].o);
+  });
+  recEl.clear(); recTx.clear(); recAt.clear();
+}
+function pause() { if (obs) { obs.disconnect(); } }
+function resume() {
+  if (!obs) return;
+  obs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+}
+var queued = false, pending = [];
+function flush() {
+  queued = false;
+  if (lang !== "en") { pending = []; return; }
+  var list = pending; pending = [];
+  pause();
+  try { list.forEach(function (el) { if (document.body.contains(el)) walk(el); }); } catch (e) {}
+  resume();
+}
+function onMut(muts) {
+  if (lang !== "en") return;
+  muts.forEach(function (m) {
+    if (m.type === "childList") {
+      pending.push(m.target);
+    } else if (m.type === "characterData") {
+      if (m.target.parentElement) pending.push(m.target.parentElement);
+    } else if (m.target.nodeType === 1) pending.push(m.target);
+  });
+  if (!queued) { queued = true; (window.requestAnimationFrame || setTimeout)(flush); }
+}
+
+function paintButtons() {
+  var b = document.querySelectorAll(".ls-sw button");
+  for (var i = 0; i < b.length; i++) b[i].setAttribute("aria-pressed", String(b[i].getAttribute("data-lang") === lang));
+}
+function apply(l, silent) {
+  if (l !== "es" && l !== "en") return;
+  var changed = l !== lang;
+  pause();
+  if (l === "en") {
+    lang = "en";
+    walk(document.body);
+    if (EN["__title__"]) { if (!apply.t0) apply.t0 = document.title; document.title = EN["__title__"]; }
+  } else {
+    lang = "es";
+    restore();
+    if (apply.t0) document.title = apply.t0;
+  }
+  document.documentElement.lang = lang;
+  resume();
+  paintButtons();
+  if (!silent) { try { localStorage.setItem(KEY, lang); } catch (e) {} }
+  if (changed) { try { window.dispatchEvent(new CustomEvent("slumenlang", { detail: lang })); } catch (e) {} }
+}
+
+function build() {
+  var box = document.createElement("div");
+  box.className = "ls-sw" + (OPTS.mount ? " ls-in" : "");
+  box.setAttribute("role", "group");
+  box.setAttribute("aria-label", "Idioma / Language");
+  box.setAttribute("data-no-i18n", "");
+  box.innerHTML = '<button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button>';
+  box.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-lang]");
+    if (b) apply(b.getAttribute("data-lang"));
+  });
+  var host = OPTS.mount ? document.querySelector(OPTS.mount) : null;
+  if (host) { if (OPTS.mountFirst) host.insertBefore(box, host.firstChild); else host.appendChild(box); }
+  else document.body.appendChild(box);
+}
+
+function start() {
+  build();
+  obs = new MutationObserver(onMut);
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  var want = saved === "es" || saved === "en" ? saved : (/^en/i.test(navigator.language || "") ? "en" : "es");
+  resume();
+  if (want === "en") apply("en", true);
+}
+
+window.SLUMEN_I18N = {
+  get lang() { return lang; },
+  set: function (l) { apply(l); },
+  t: function (es, en) { return lang === "en" ? en : es; },
+  __collect: function () {
+    collecting = { keys: [] };
+    try { walk(document.body); } finally { var k = collecting.keys; collecting = null; window.__keys = k; }
+    return window.__keys;
+  }
+};
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+else start();
+})();
+</script>
+
+
+<script>
+/* ---------- Test Slumen: 10 preguntas para elegir por dónde empezar ---------- */
+(function () {
+  var tarjeta = document.getElementById("testTarjeta");
+  if (!tarjeta) return;
+  function t(es, en) { return (window.SLUMEN_I18N && SLUMEN_I18N.lang === "en") ? en : es; }
+
+  var PREGUNTAS = [
+    { eje: "mente",    es: "Le doy vueltas a lo mismo una y otra vez, aunque quiera parar.", en: "I go over the same thing again and again, even when I want to stop." },
+    { eje: "cuerpo",   es: "Siento el cuerpo tenso: hombros, mandíbula o estómago apretados.", en: "My body feels tense: tight shoulders, jaw or stomach." },
+    { eje: "espiritu", es: "Siento que perdí la conexión con Dios, o con algo más grande que yo.", en: "I feel I have lost my connection with God, or with something greater than me." },
+    { eje: "mente",    es: "Me cuesta apagar la mente cuando quiero descansar o dormir.", en: "It’s hard to switch off my mind when I want to rest or sleep." },
+    { eje: "cuerpo",   es: "Como rápido, sin hambre real o frente a una pantalla.", en: "I eat fast, without real hunger or in front of a screen." },
+    { eje: "espiritu", es: "Me cuesta encontrar motivos para agradecer en mi día.", en: "I find it hard to find reasons to be grateful in my day." },
+    { eje: "mente",    es: "Me hablo con dureza cuando algo no sale como esperaba.", en: "I speak harshly to myself when something doesn’t go as expected." },
+    { eje: "cuerpo",   es: "Paso el día sin moverme ni detenerme a respirar con calma.", en: "I go through the day without moving or stopping to breathe calmly." },
+    { eje: "espiritu", es: "Siento que todo depende de mí y me cuesta confiar y soltar.", en: "I feel everything depends on me, and it’s hard to trust and let go." },
+    { eje: "mente",    es: "Me preocupa más lo que podría pasar que lo que estoy viviendo hoy.", en: "I worry more about what might happen than about what I’m living today." }
+  ];
+  var OPCIONES = [
+    { v: 0, es: "Nunca", en: "Never" },
+    { v: 1, es: "A veces", en: "Sometimes" },
+    { v: 2, es: "Casi siempre", en: "Almost always" }
+  ];
+  var EJES = {
+    mente: {
+      nombre: ["Mente", "Mind"],
+      frase: ["Tu mente está pidiendo una pausa.", "Your mind is asking for a pause."],
+      texto: ["No tienes que pelear con tus pensamientos. Puedes aprender a notarlos, soltarlos con suavidad y volver a pensar desde la calma. Empieza por el Método Slumen Mente y acompáñalo con Slumen Podcast.",
+              "You don’t have to fight your thoughts. You can learn to notice them, let them go gently and think again from a place of calm. Start with the Slumen Mind Method and pair it with the Slumen Podcast."]
+    },
+    cuerpo: {
+      nombre: ["Cuerpo", "Body"],
+      frase: ["Tu cuerpo te está hablando.", "Your body is speaking to you."],
+      texto: ["Respirar despacio, moverte con conciencia y comer con presencia puede devolverte el descanso. Empieza por Movimiento y respiración consciente y acompáñalo con el Recetario Slumen 30 días.",
+              "Breathing slowly, moving mindfully and eating with presence can bring your rest back. Start with Mindful Movement and Breathing and pair it with the Slumen 30-Day Recipe Book."]
+    },
+    espiritu: {
+      nombre: ["Espíritu", "Spirit"],
+      frase: ["Tu espíritu está pidiendo raíz.", "Your spirit is asking for roots."],
+      texto: ["Volver a la fe, a la gratitud y a la confianza puede darte paz, aunque todavía no veas todo claro. Empieza por el Diario de Gratitud y, si necesitas un mensaje que te centre cada día, acompáñalo con Mensajes para volver a ti.",
+              "Returning to faith, gratitude and trust can give you peace, even when you can’t see everything clearly yet. Start with the Gratitude Journal and, if you need a message to center you each day, pair it with Messages to Return to Yourself."]
+    }
+  };
+  var ORDEN = ["mente", "cuerpo", "espiritu"];
+  var respuestas = [];
+  var paso = 0;
+
+  function boton(txt, clase) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = clase; b.textContent = txt;
+    return b;
+  }
+
+  function pintarPregunta() {
+    var p = PREGUNTAS[paso];
+    delete tarjeta.dataset.estado;
+    tarjeta.innerHTML = "";
+    var avance = document.createElement("div");
+    avance.className = "test-avance";
+    avance.innerHTML = "<span>" + t("Pregunta ", "Question ") + (paso + 1) + t(" de ", " of ") + PREGUNTAS.length + "</span><span>" + t(EJES[p.eje].nombre[0], EJES[p.eje].nombre[1]) + "</span>";
+    var barra = document.createElement("div");
+    barra.className = "test-barra";
+    barra.innerHTML = '<i style="width:' + Math.round((paso / PREGUNTAS.length) * 100) + '%"></i>';
+    var q = document.createElement("p");
+    q.className = "test-pregunta"; q.id = "testPregunta";
+    q.textContent = t(p.es, p.en);
+    var ops = document.createElement("div");
+    ops.className = "test-opciones"; ops.setAttribute("role", "group"); ops.setAttribute("aria-labelledby", "testPregunta");
+    OPCIONES.forEach(function (o) {
+      var b = boton(t(o.es, o.en), "test-opcion");
+      b.setAttribute("aria-pressed", String(respuestas[paso] === o.v));
+      b.addEventListener("click", function () {
+        respuestas[paso] = o.v;
+        b.setAttribute("aria-pressed", "true");
+        setTimeout(function () {
+          if (paso < PREGUNTAS.length - 1) { paso++; pintarPregunta(); }
+          else pintarResultado();
+        }, 260);
+      });
+      ops.appendChild(b);
+    });
+    var pie = document.createElement("div");
+    pie.className = "test-pie";
+    var atras = boton("← " + t("Anterior", "Back"), "test-atras");
+    atras.disabled = paso === 0;
+    atras.addEventListener("click", function () { if (paso > 0) { paso--; pintarPregunta(); } });
+    pie.appendChild(atras);
+    tarjeta.append(avance, barra, q, ops, pie);
+  }
+
+  function pintarResultado() {
+    var puntos = { mente: 0, cuerpo: 0, espiritu: 0 }, maximo = { mente: 0, cuerpo: 0, espiritu: 0 };
+    PREGUNTAS.forEach(function (p, i) { puntos[p.eje] += respuestas[i] || 0; maximo[p.eje] += 2; });
+    var pct = {};
+    ORDEN.forEach(function (e) { pct[e] = Math.round((puntos[e] / maximo[e]) * 100); });
+    var mayor = Math.max(pct.mente, pct.cuerpo, pct.espiritu);
+    var primeros = ORDEN.filter(function (e) { return pct[e] === mayor; });
+    var principal = primeros[0];
+
+    tarjeta.innerHTML = "";
+    var r = document.createElement("div");
+    r.className = "test-resultado";
+    var etiqueta = '<span class="etiqueta">' + t("Tu punto de partida", "Your starting point") + "</span>";
+    var titulo, frase, texto;
+    if (mayor < 34) {
+      titulo = t("Estás en un buen lugar", "You’re in a good place");
+      frase = t("Hoy tu mente, tu cuerpo y tu espíritu se sienten en calma.", "Today your mind, body and spirit feel calm.");
+      texto = t("Puedes empezar por el eje que más te llame. La Guía Vuelve a ti, gratuita, es una buena puerta para cuidar lo que ya está floreciendo.",
+                "You can begin with the path that calls you most. The free Return to Yourself Guide is a good door to care for what is already blooming.");
+    } else if (primeros.length > 1) {
+      var nombres = primeros.map(function (e) { return t(EJES[e].nombre[0], EJES[e].nombre[1]); });
+      titulo = nombres.join(" " + t("y", "and") + " ");
+      frase = t("Estos ejes piden tu atención por igual.", "These paths are asking for your attention equally.");
+      texto = t("Empieza por el que hoy más te llame. Un paso pequeño en uno también acompaña al otro.",
+                "Start with the one that calls you most today. A small step in one also supports the other.");
+    } else {
+      titulo = t(EJES[principal].nombre[0], EJES[principal].nombre[1]);
+      frase = t(EJES[principal].frase[0], EJES[principal].frase[1]);
+      texto = t(EJES[principal].texto[0], EJES[principal].texto[1]);
+    }
+    r.innerHTML = etiqueta + "<h3></h3><p class=\"frase\"></p><p></p>";
+    r.querySelector("h3").textContent = titulo;
+    r.querySelector(".frase").textContent = frase;
+    r.querySelectorAll("p")[1].textContent = texto;
+
+    var lista = document.createElement("ul");
+    lista.className = "test-ejes";
+    lista.setAttribute("aria-label", t("Cómo salió cada eje", "How each path scored"));
+    ORDEN.forEach(function (e) {
+      var li = document.createElement("li");
+      li.className = e;
+      li.innerHTML = "<span></span><span class=\"pista\"><i style=\"width:" + pct[e] + "%\"></i></span><span class=\"n\">" + pct[e] + " %</span>";
+      li.firstChild.textContent = t(EJES[e].nombre[0], EJES[e].nombre[1]);
+      lista.appendChild(li);
+    });
+    r.appendChild(lista);
+
+    var acciones = document.createElement("div");
+    acciones.className = "test-acciones";
+    var ir = document.createElement("a");
+    ir.className = "boton boton--lleno";
+    if (mayor < 34) {
+      ir.href = "#tres-ejes"; ir.setAttribute("data-ancla", "tres-ejes");
+      ir.innerHTML = t("Ver los tres ejes", "See the three paths") + ' <span class="flecha" aria-hidden="true">→</span>';
+    } else {
+      ir.href = "#" + principal; ir.setAttribute("data-ir", principal);
+      ir.innerHTML = t("Ir a ", "Go to ") + t(EJES[principal].nombre[0], EJES[principal].nombre[1]) + ' <span class="flecha" aria-hidden="true">→</span>';
+    }
+    var otra = boton(t("Hacer el test otra vez", "Take the test again"), "test-atras");
+    otra.addEventListener("click", function () { respuestas = []; paso = 0; pintarPregunta(); });
+    acciones.append(ir, otra);
+    r.appendChild(acciones);
+    tarjeta.appendChild(r);
+    tarjeta.dataset.estado = "resultado";
+  }
+
+  function repintar() {
+    if (tarjeta.dataset.estado === "resultado") pintarResultado(); else pintarPregunta();
+  }
+  window.addEventListener("slumenlang", repintar);
+  pintarPregunta();
+})();
+</script>
+
+<script>
+/* ---------- Así se ve por dentro: ventana con celular y scroll hacia arriba ---------- */
+(function () {
+  var visor = document.getElementById("visor");
+  if (!visor) return;
+  var img = document.getElementById("visorImg");
+  var titulo = document.getElementById("visorTitulo");
+  var pantalla = visor.querySelector(".pantalla");
+  var cerrarBtn = visor.querySelector(".visor-cerrar");
+  var origen = null;
+
+  function medir() {
+    if (!img.naturalHeight) return;
+    var alto = pantalla.clientWidth * img.naturalHeight / img.naturalWidth;
+    var dist = Math.max(0, alto - pantalla.clientHeight);
+    img.style.setProperty("--dist", (-dist) + "px");
+    img.style.setProperty("--dur", Math.max(12, Math.round(dist / 42)) + "s");
+    img.classList.remove("sube"); void img.offsetWidth; img.classList.add("sube");
+  }
+
+  function abrir(btn) {
+    origen = btn;
+    var card = btn.closest(".producto");
+    titulo.textContent = card ? card.querySelector("h3").textContent : "";
+    img.classList.remove("sube");
+    img.onload = medir;
+    img.src = "img/recorrido/" + btn.getAttribute("data-recorrido") + ".jpg";
+    visor.classList.remove("pausado");
+    visor.hidden = false;
+    document.body.classList.add("visor-abierto");
+    if (img.complete) medir();
+    cerrarBtn.focus();
+  }
+
+  function cerrar() {
+    if (visor.hidden) return;
+    visor.hidden = true;
+    img.classList.remove("sube");
+    document.body.classList.remove("visor-abierto");
+    if (origen) origen.focus();
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".ver-dentro");
+    if (b) { e.preventDefault(); abrir(b); return; }
+    if (e.target.closest("[data-cerrar]")) { cerrar(); return; }
+    if (e.target.closest("#visor .telefono")) visor.classList.toggle("pausado");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (visor.hidden) return;
+    if (e.key === "Escape") cerrar();
+    if (e.key === "Tab") { e.preventDefault(); cerrarBtn.focus(); }
+  });
+  window.addEventListener("resize", function () { if (!visor.hidden) medir(); });
+})();
+</script>
+
+</body>
+</html>
