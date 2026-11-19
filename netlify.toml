@@ -1,0 +1,11 @@
+# Sitio estático + funciones de Netlify (carpeta netlify/functions).
+[build]
+  publish = "."
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/catalogo.json"
+  [headers.values]
+    Cache-Control = "no-cache"

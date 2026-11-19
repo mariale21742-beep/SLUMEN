@@ -1,10 +1,12 @@
 # SLUMEN · Página web
 
-Sitio de una sola página de Slumen: inicio, test, Aleja y los tres ejes (Mente, Cuerpo, Espíritu).
+Sitio de Slumen: inicio, test, Aleja y los tres ejes (Mente, Cuerpo, Espíritu), con carrito y checkout.
 
-- `index.html`: la página completa (HTML, CSS y JavaScript en un solo archivo).
-- `img/`: logo, foto de Aleja y capturas de cada producto (`img/recorrido/`).
-- `Guia-Vuelve-a-ti-Slumen.pdf`: guía gratuita.
-- `LEEME.txt`: instrucciones para el desarrollador (enlaces de Hotmart, precios, etc.).
+- `index.html`: la página principal. Los botones **Comprar** agregan al carrito.
+- `checkout.html` y `gracias.html`: pago y confirmación.
+- `catalogo.json`: precios en COP y USD (los que cobra el servidor).
+- `netlify/`: funciones de servidor para **Wompi**, **Mercado Pago**, **PayPal** y **Stripe**, con correo automático de acceso (Resend).
+- `img/`, `css/`, `js/`: imágenes, estilos y el carrito.
+- `LEEME.txt`: guía completa para publicar en Netlify y configurar cada pasarela.
 
-Es un sitio estático: se puede publicar tal cual en GitHub Pages, Netlify o Vercel.
+Se publica en **Netlify** (los pagos necesitan las funciones de servidor; GitHub Pages no sirve para eso).

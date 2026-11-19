@@ -1,0 +1,9 @@
+{
+  "name": "slumen-web",
+  "private": true,
+  "type": "module",
+  "description": "Página de Slumen con carrito y pagos (Wompi, Mercado Pago, PayPal, Stripe) en Netlify.",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

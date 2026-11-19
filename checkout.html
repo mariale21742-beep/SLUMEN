@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pagar · Slumen</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/pago.css">
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a href="index.html" aria-label="Slumen, inicio"><img src="img/nombre.png" alt="Slumen" width="372" height="92"></a>
+    <div class="cabecera-der">
+      <span class="seguro"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span data-t="seguro">Pago seguro</span></span>
+      <div class="idiomas" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="pago">
+  <div class="envoltura">
+    <div class="pago-cabeza">
+      <a class="volver" href="index.html#tres-ejes"><span aria-hidden="true">←</span> <span data-t="seguir">Seguir mirando</span></a>
+      <span class="etiqueta" data-t="etiqueta">Tu compra</span>
+      <h1 data-t="titulo">Un paso más para volver a ti.</h1>
+    </div>
+
+    <div id="vacio" class="tarjeta vacio" hidden>
+      <span class="etiqueta" data-t="vacioEtiqueta">Tu carrito</span>
+      <h2 data-t="vacioTitulo">Todavía no has elegido nada.</h2>
+      <p data-t="vacioTexto">Mira los tres ejes y agrega lo que hoy te llame.</p>
+      <a class="boton boton--lleno" href="index.html#tres-ejes"><span data-t="verEjes">Ver los productos</span> <span aria-hidden="true">→</span></a>
+    </div>
+
+    <form id="formulario" class="pago-rejilla" novalidate hidden>
+      <div class="tarjeta">
+        <div class="paso"><b>1</b><h2 data-t="datos">Tus datos</h2></div>
+        <div class="campos">
+          <div class="campo campo--ancho">
+            <label for="nombre" data-t="nombre">Nombre completo</label>
+            <input id="nombre" name="nombre" autocomplete="name" required maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="email" data-t="email">Correo</label>
+            <input id="email" name="email" type="email" autocomplete="email" required maxlength="120" aria-describedby="emailAyuda">
+            <span class="ayuda" id="emailAyuda" data-t="emailAyuda">Aquí te llega el acceso a tus productos.</span>
+          </div>
+          <div class="campo">
+            <label for="celular"><span data-t="celular">Celular</span> <small data-t="opcional">(opcional)</small></label>
+            <input id="celular" name="celular" type="tel" autocomplete="tel" maxlength="20">
+          </div>
+        </div>
+
+        <div class="paso"><b>2</b><h2 data-t="medio">Cómo quieres pagar</h2></div>
+        <fieldset class="medios" id="medios">
+          <legend class="etiqueta" data-t="medioLeyenda">Medio de pago</legend>
+        </fieldset>
+        <p class="aviso-preview" id="avisoPreview" hidden data-t="preview">Vista previa: los pagos se activan cuando la página esté publicada en Netlify con las llaves de cada pasarela.</p>
+      </div>
+
+      <aside class="tarjeta resumen" aria-labelledby="resumenTitulo">
+        <div class="paso"><b>3</b><h2 id="resumenTitulo" data-t="resumen">Tu pedido</h2></div>
+        <ul class="lineas" id="lineas"></ul>
+        <div class="total"><span data-t="total">Total</span><div><b id="total">$0</b><small id="moneda">COP</small></div></div>
+        <button class="boton boton--lleno pagar" id="pagar" type="submit"><span id="pagarTexto">Pagar</span> <span aria-hidden="true">→</span></button>
+        <p class="error" id="error" role="alert"></p>
+        <div class="nota">
+          <p data-t="nota1">Productos digitales: recibes el acceso en tu correo apenas se confirme el pago.</p>
+          <p data-t="nota2">Pagas en la página segura de la pasarela que elijas. Slumen no guarda los datos de tu tarjeta.</p>
+        </div>
+      </aside>
+    </form>
+  </div>
+</main>
+
+<script src="js/carrito.js"></script>
+<script>
+(function () {
+  var T = {
+    es: {
+      seguro: "Pago seguro", seguir: "Seguir mirando", etiqueta: "Tu compra", titulo: "Un paso más para volver a ti.",
+      vacioEtiqueta: "Tu carrito", vacioTitulo: "Todavía no has elegido nada.", vacioTexto: "Mira los tres ejes y agrega lo que hoy te llame.", verEjes: "Ver los productos",
+      datos: "Tus datos", nombre: "Nombre completo", email: "Correo", emailAyuda: "Aquí te llega el acceso a tus productos.", celular: "Celular", opcional: "(opcional)",
+      medio: "Cómo quieres pagar", medioLeyenda: "Medio de pago",
+      preview: "Vista previa: los pagos se activan cuando la página esté publicada en Netlify con las llaves de cada pasarela.",
+      resumen: "Tu pedido", total: "Total", pagar: "Pagar", quitar: "Quitar", abriendo: "Abriendo el pago…",
+      nota1: "Productos digitales: recibes el acceso en tu correo apenas se confirme el pago.",
+      nota2: "Pagas en la página segura de la pasarela que elijas. Slumen no guarda los datos de tu tarjeta.",
+      errNombre: "Escribe tu nombre.", errEmail: "Revisa tu correo: así te enviamos el acceso.", errMedio: "Elige un medio de pago.",
+      errPreview: "En la vista previa no se puede pagar todavía.", errRed: "No pudimos abrir el pago. Intenta de nuevo en un momento.",
+      incluyeN: "Incluye los 5 productos", pesos: "Pesos colombianos", dolares: "Dólares"
+    },
+    en: {
+      seguro: "Secure payment", seguir: "Keep browsing", etiqueta: "Your purchase", titulo: "One more step to return to yourself.",
+      vacioEtiqueta: "Your cart", vacioTitulo: "You haven’t chosen anything yet.", vacioTexto: "Look through the three paths and add what calls you today.", verEjes: "See the products",
+      datos: "Your details", nombre: "Full name", email: "Email", emailAyuda: "Your access will arrive here.", celular: "Phone", opcional: "(optional)",
+      medio: "How you want to pay", medioLeyenda: "Payment method",
+      preview: "Preview: payments turn on once the page is live on Netlify with each gateway’s keys.",
+      resumen: "Your order", total: "Total", pagar: "Pay", quitar: "Remove", abriendo: "Opening payment…",
+      nota1: "Digital products: your access arrives by email as soon as the payment is confirmed.",
+      nota2: "You pay on the secure page of the gateway you choose. Slumen never stores your card details.",
+      errNombre: "Please write your name.", errEmail: "Check your email: that’s where we send your access.", errMedio: "Choose a payment method.",
+      errPreview: "Payments aren’t available in the preview yet.", errRed: "We couldn’t open the payment. Please try again in a moment.",
+      incluyeN: "Includes all 5 products", pesos: "Colombian pesos", dolares: "US dollars"
+    }
+  };
+  var C = window.SlumenCarrito;
+  var lang = C.idioma();
+  var activas = null;          // pasarelas habilitadas en el servidor (null = vista previa sin servidor)
+  var elegida = null;
+  var enviando = false;
+  var $ = function (id) { return document.getElementById(id); };
+  function t(k) { return (T[lang] && T[lang][k]) || T.es[k] || k; }
+
+  function ponerIdioma(l) {
+    lang = l === "en" ? "en" : "es";
+    try { localStorage.setItem("slumen-lang", lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    document.title = (lang === "en" ? "Checkout" : "Pagar") + " · Slumen";
+    document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
+    document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
+    pintarMedios(); pintar();
+  }
+
+  function pintarMedios() {
+    var cat = C.catalogo; if (!cat) return;
+    var caja = $("medios");
+    caja.querySelectorAll(".medio").forEach(function (n) { n.remove(); });
+    var ids = Object.keys(cat.pasarelas).filter(function (k) { return !activas || activas.indexOf(k) >= 0; });
+    if (!elegida || ids.indexOf(elegida) < 0) {
+      var preferida = lang === "en" ? ["paypal", "stripe", "wompi", "mercadopago"] : ["wompi", "mercadopago", "paypal", "stripe"];
+      elegida = preferida.filter(function (k) { return ids.indexOf(k) >= 0; })[0] || null;
+    }
+    ids.forEach(function (k) {
+      var p = cat.pasarelas[k];
+      var label = document.createElement("label");
+      label.className = "medio";
+      label.innerHTML = '<input type="radio" name="pasarela"><span class="punto" aria-hidden="true"></span><span><b></b><span class="desc"></span></span><span class="moneda"></span>';
+      var input = label.querySelector("input");
+      input.value = k; input.checked = k === elegida;
+      input.addEventListener("change", function () { elegida = k; pintar(); });
+      label.querySelector("b").textContent = p.nombre;
+      label.querySelector(".desc").textContent = p[lang];
+      label.querySelector(".moneda").textContent = p.moneda;
+      label.querySelector(".moneda").title = p.moneda === "USD" ? t("dolares") : t("pesos");
+      caja.appendChild(label);
+    });
+    $("avisoPreview").hidden = activas !== null;
+  }
+
+  function moneda() { return elegida && C.catalogo ? C.catalogo.pasarelas[elegida].moneda : (lang === "en" ? "USD" : "COP"); }
+
+  function pintar() {
+    if (!C.catalogo) return;
+    var m = moneda();
+    var lineas = C.lineas(m, lang);
+    $("vacio").hidden = lineas.length > 0;
+    $("formulario").hidden = lineas.length === 0;
+    var ul = $("lineas"); ul.innerHTML = "";
+    var total = 0;
+    lineas.forEach(function (l) {
+      total += l.valor;
+      var li = document.createElement("li");
+      li.innerHTML = '<span><span class="nombre"></span><br><span class="eje"></span></span><span class="valor"><s></s><span class="ahora"></span></span><button type="button" class="quitar"></button>';
+      li.querySelector(".nombre").textContent = l.nombre;
+      li.querySelector(".eje").textContent = l.incluye ? t("incluyeN") : l.eje;
+      li.querySelector("s").textContent = C.precio(l.antes, m);
+      li.querySelector(".ahora").textContent = C.precio(l.valor, m);
+      var q = li.querySelector(".quitar");
+      q.textContent = t("quitar");
+      q.setAttribute("aria-label", t("quitar") + ": " + l.nombre);
+      q.addEventListener("click", function () { C.quitar(l.id); });
+      ul.appendChild(li);
+    });
+    $("total").textContent = C.precio(total, m);
+    $("moneda").textContent = m === "USD" ? "USD · " + t("dolares") : "COP · " + t("pesos");
+    $("pagarTexto").textContent = enviando ? t("abriendo") : t("pagar") + " " + C.precio(total, m);
+  }
+
+  function error(txt, campo) {
+    $("error").textContent = txt || "";
+    ["nombre", "email"].forEach(function (id) { $(id).removeAttribute("aria-invalid"); });
+    if (campo) { $(campo).setAttribute("aria-invalid", "true"); $(campo).focus(); }
+  }
+
+  $("formulario").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (enviando) return;
+    var nombre = $("nombre").value.trim(), email = $("email").value.trim(), celular = $("celular").value.trim();
+    if (nombre.length < 2) return error(t("errNombre"), "nombre");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return error(t("errEmail"), "email");
+    if (!elegida) return error(t("errMedio"));
+    if (activas === null) return error(t("errPreview"));
+    error("");
+    enviando = true; $("pagar").disabled = true; pintar();
+    fetch("/api/crear-pago", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ items: C.leer(), pasarela: elegida, comprador: { nombre: nombre, email: email, celular: celular }, idioma: lang })
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.d.url) throw new Error(res.d && res.d.error);
+        try { sessionStorage.setItem("slumen-pedido", res.d.ref); } catch (e2) {}
+        window.location.href = res.d.url;
+      })
+      .catch(function (err) {
+        enviando = false; $("pagar").disabled = false; pintar();
+        error(lang === "es" && err && err.message ? err.message : t("errRed"));
+      });
+  });
+
+  document.querySelectorAll("[data-lang]").forEach(function (b) { b.addEventListener("click", function () { ponerIdioma(b.dataset.lang); }); });
+  window.addEventListener("slumencarrito", pintar);
+
+  // Datos guardados de una compra anterior en este navegador (solo para no volver a escribirlos).
+  try { var prev = JSON.parse(localStorage.getItem("slumen-comprador") || "{}"); ["nombre", "email", "celular"].forEach(function (k) { if (prev[k]) $(k).value = prev[k]; }); } catch (e) {}
+  ["nombre", "email", "celular"].forEach(function (k) {
+    $(k).addEventListener("change", function () {
+      try { localStorage.setItem("slumen-comprador", JSON.stringify({ nombre: $("nombre").value, email: $("email").value, celular: $("celular").value })); } catch (e) {}
+    });
+  });
+
+  Promise.all([
+    C.cargar(),
+    fetch("/api/config").then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) { activas = d.pasarelas || []; }).catch(function () { activas = null; })
+  ]).then(function () { ponerIdioma(lang); });
+})();
+</script>
+</body>
+</html>

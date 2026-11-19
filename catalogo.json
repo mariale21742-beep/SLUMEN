@@ -1,0 +1,17 @@
+{
+  "_nota": "Precios de venta. cop en pesos colombianos (sin decimales); usd en dólares. Si cambias un precio aquí, cámbialo también en index.html (class=\"precio\").",
+  "productos": {
+    "metodo":     { "es": "Método Slumen Mente", "en": "Slumen Mind Method", "eje": ["Mente", "Mind"], "cop": 49900, "copAntes": 69900, "usd": 15.99, "usdAntes": 21.99, "acceso": "ACCESO_METODO" },
+    "movimiento": { "es": "Movimiento y respiración consciente", "en": "Mindful Movement and Breathing", "eje": ["Cuerpo", "Body"], "cop": 49900, "copAntes": 79900, "usd": 15.99, "usdAntes": 24.99, "acceso": "ACCESO_MOVIMIENTO" },
+    "recetario":  { "es": "Recetario Slumen 30 días", "en": "Slumen 30-Day Recipe Book", "eje": ["Cuerpo", "Body"], "cop": 39900, "copAntes": 54900, "usd": 12.99, "usdAntes": 17.99, "acceso": "ACCESO_RECETARIO" },
+    "mensajes":   { "es": "Mensajes de Dios · cartas digitales", "en": "Messages from God · digital cards", "eje": ["Espíritu", "Spirit"], "cop": 37900, "copAntes": 59900, "usd": 11.99, "usdAntes": 18.99, "acceso": "ACCESO_MENSAJES" },
+    "diario":     { "es": "Diario de Gratitud", "en": "Gratitude Journal", "eje": ["Espíritu", "Spirit"], "cop": 49900, "copAntes": 79900, "usd": 15.99, "usdAntes": 24.99, "acceso": "ACCESO_DIARIO" },
+    "pack":       { "es": "Pack Vuelve a ti", "en": "Return to Yourself Pack", "eje": ["Los tres ejes", "All three paths"], "cop": 249900, "copAntes": 314900, "usd": 79.99, "usdAntes": 99.99, "incluye": ["metodo", "movimiento", "recetario", "mensajes", "diario"] }
+  },
+  "pasarelas": {
+    "wompi":       { "nombre": "Wompi", "moneda": "COP", "es": "Tarjeta, PSE, Nequi o Bancolombia", "en": "Card, PSE, Nequi or Bancolombia" },
+    "mercadopago": { "nombre": "Mercado Pago", "moneda": "COP", "es": "Tarjeta, PSE o saldo en Mercado Pago", "en": "Card, PSE or Mercado Pago balance" },
+    "paypal":      { "nombre": "PayPal", "moneda": "USD", "es": "Cuenta PayPal o tarjeta internacional", "en": "PayPal account or international card" },
+    "stripe":      { "nombre": "Stripe", "moneda": "USD", "es": "Tarjeta internacional, Apple Pay o Google Pay", "en": "International card, Apple Pay or Google Pay" }
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gracias · Slumen</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/pago.css">
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a href="index.html" aria-label="Slumen, inicio"><img src="img/nombre.png" alt="Slumen" width="372" height="92"></a>
+  </div>
+</header>
+
+<main class="gracias" id="gracias" data-estado="verificando">
+  <div class="envoltura" style="display:grid;place-items:center">
+    <div class="tarjeta" role="status" aria-live="polite">
+      <div class="sol" aria-hidden="true"></div>
+      <span class="etiqueta" id="etiqueta"></span>
+      <h1 id="titulo"></h1>
+      <p id="texto"></p>
+      <div class="acciones" id="acciones"></div>
+    </div>
+  </div>
+</main>
+
+<script src="js/carrito.js"></script>
+<script>
+(function () {
+  var C = window.SlumenCarrito;
+  var lang = C.idioma();
+  document.documentElement.lang = lang;
+  var es = lang !== "en";
+  var $ = function (id) { return document.getElementById(id); };
+
+  var TXT = {
+    verificando: [es ? "Un momento" : "One moment", es ? "Estamos confirmando tu pago." : "We’re confirming your payment.", es ? "Respira. Esto toma unos segundos." : "Breathe. This takes a few seconds."],
+    aprobado: [es ? "Pago confirmado" : "Payment confirmed", es ? "Gracias por elegirte." : "Thank you for choosing yourself.", ""],
+    pendiente: [es ? "Pago en proceso" : "Payment in progress", es ? "Tu pago está en camino." : "Your payment is on its way.", es ? "Algunos medios, como PSE, tardan unos minutos. Apenas se confirme, te llega el acceso al correo." : "Some methods take a few minutes. As soon as it’s confirmed, your access arrives by email."],
+    rechazado: [es ? "Pago no completado" : "Payment not completed", es ? "Esta vez el pago no pasó." : "The payment didn’t go through this time.", es ? "No se hizo ningún cobro. Puedes intentarlo de nuevo con el mismo u otro medio de pago." : "You weren’t charged. You can try again with the same or another payment method."],
+    desconocido: [es ? "Tu compra" : "Your purchase", es ? "No encontramos tu pago." : "We couldn’t find your payment.", es ? "Si pagaste y no te llega el correo en unos minutos, escríbenos y lo revisamos contigo." : "If you paid and the email doesn’t arrive in a few minutes, write to us and we’ll look into it with you."]
+  };
+
+  function boton(texto, href, lleno) {
+    var a = document.createElement("a");
+    a.className = "boton " + (lleno ? "boton--lleno" : "boton--linea");
+    a.href = href; a.textContent = texto;
+    return a;
+  }
+
+  function mostrar(estado, datos) {
+    var x = TXT[estado] || TXT.desconocido;
+    $("gracias").dataset.estado = estado;
+    $("etiqueta").textContent = x[0];
+    $("titulo").textContent = x[1];
+    var texto = x[2];
+    if (estado === "aprobado") {
+      texto = es
+        ? "Te enviamos el acceso a tus productos" + (datos && datos.email ? " a " + datos.email : " a tu correo") + ". Si no lo ves en unos minutos, revisa la carpeta de spam o promociones."
+        : "We sent your access" + (datos && datos.email ? " to " + datos.email : " to your email") + ". If you don’t see it in a few minutes, check your spam or promotions folder.";
+    }
+    $("texto").textContent = texto;
+    var acc = $("acciones"); acc.innerHTML = "";
+    if (estado === "rechazado") acc.append(boton(es ? "Intentar de nuevo →" : "Try again →", "checkout.html", true));
+    if (estado !== "verificando") acc.append(boton(es ? "Volver a Slumen" : "Back to Slumen", "index.html", estado !== "rechazado"));
+    if (estado === "aprobado" || estado === "pendiente") C.vaciar();
+  }
+
+  // Cada pasarela vuelve con parámetros distintos.
+  var q = new URLSearchParams(location.search);
+  var pasarela = null, id = null;
+  if (q.get("session_id")) { pasarela = "stripe"; id = q.get("session_id"); }
+  else if (q.get("payment_id") || q.get("collection_id")) { pasarela = "mercadopago"; id = q.get("payment_id") || q.get("collection_id"); }
+  else if (q.get("token")) { pasarela = "paypal"; id = q.get("token"); }
+  else if (q.get("id")) { pasarela = "wompi"; id = q.get("id"); }
+
+  mostrar("verificando");
+  if (!pasarela) { mostrar("desconocido"); return; }
+
+  var intentos = 0;
+  function consultar() {
+    intentos++;
+    fetch("/api/confirmar?pasarela=" + encodeURIComponent(pasarela) + "&id=" + encodeURIComponent(id))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.estado === "pendiente" && intentos < 6) { setTimeout(consultar, 4000); return; }
+        mostrar(d.estado === "revisar" ? "pendiente" : d.estado, d);
+      })
+      .catch(function () { if (intentos < 4) setTimeout(consultar, 4000); else mostrar("pendiente"); });
+  }
+  consultar();
+})();
+</script>
+</body>
+</html>

@@ -481,6 +481,45 @@ img { display: block; max-width: 100%; }
 body.visor-abierto { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .visor .pantalla { overflow-y: auto; } .visor .pantalla img.sube { animation: none; } }
 
+/* ---------- Carrito ---------- */
+.carrito-flotante {
+  position: fixed; right: 16px; bottom: 16px; z-index: 70; display: inline-flex; align-items: center; gap: 10px;
+  font: 700 15px/1 var(--f-cuerpo); color: var(--marfil); background: var(--dorado); border: 0; border-radius: 999px;
+  padding: 14px 18px; cursor: pointer; box-shadow: 0 18px 34px -18px rgba(43, 36, 32, .8); transition: transform .4s var(--lento), background .3s;
+}
+.carrito-flotante:hover { background: var(--texto); transform: translateY(-2px); }
+.carrito-flotante svg { width: 18px; height: 18px; }
+.carrito-flotante b { min-width: 22px; height: 22px; border-radius: 999px; background: var(--turquesa); color: var(--texto); display: inline-grid; place-items: center; font-size: 12px; padding: 0 6px; }
+.carrito-flotante[hidden] { display: none; }
+.carrito-flotante.salta { animation: salta .6s var(--lento); }
+@keyframes salta { 30% { transform: scale(1.08); } }
+.carrito { position: fixed; inset: 0; z-index: 95; }
+.carrito[hidden] { display: none; }
+.carrito-fondo { position: absolute; inset: 0; background: rgba(89, 75, 67, .45); backdrop-filter: blur(3px); animation: visor-fondo .3s ease both; }
+.carrito-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(430px, 100%); background: var(--hoja); display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain;
+  box-shadow: -30px 0 60px -40px rgba(43, 36, 32, .7); animation: carrito-entra .45s var(--lento) both;
+}
+@keyframes carrito-entra { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.carrito-cabeza { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 22px 22px 16px; border-bottom: 1px solid var(--linea); background: var(--turquesa); }
+.carrito-cabeza h2 { font-size: 30px; }
+.carrito-cabeza .visor-cerrar { position: static; }
+.carrito-lista { list-style: none; margin: 0; padding: 8px 22px; flex: 1 0 auto; }
+.carrito-lista li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 16px 0; border-bottom: 1px solid var(--linea); }
+.carrito-lista .n { font-weight: 700; line-height: 1.3; }
+.carrito-lista .e { font-size: 13px; color: var(--texto-suave); }
+.carrito-lista .v { text-align: right; font-weight: 700; white-space: nowrap; }
+.carrito-lista .v s { display: block; font-weight: 400; font-size: 13px; color: var(--texto-suave); }
+.carrito-lista .q { justify-self: start; background: none; border: 0; padding: 0; font-size: 13px; color: var(--texto-suave); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.carrito-vacio { padding: 28px 0; color: var(--texto-suave); }
+.carrito-pie { display: grid; gap: 12px; padding: 18px 22px 22px; border-top: 1px solid var(--linea); }
+.carrito-total { display: flex; justify-content: space-between; align-items: baseline; }
+.carrito-total b { font: 600 30px/1 var(--f-titulo); }
+.carrito-pie .boton { justify-content: center; }
+.carrito-pie .nota-c { font-size: 13px; color: var(--texto-suave); margin: 0; }
+.carrito-pie .test-atras { justify-self: center; }
+body.carrito-abierto { overflow: hidden; }
+
 /* ---------- Versión física ---------- */
 .fisico { display: grid; gap: 12px; padding-top: 16px; border-top: 1px dashed var(--dorado-claro); font-size: 15px; }
 .fisico-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -1030,8 +1069,26 @@ body.visor-abierto { overflow: hidden; }
   </div>
 </footer>
 
+<button type="button" class="carrito-flotante" id="carritoBoton" hidden data-no-i18n aria-controls="carrito">
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h12l-1 10H5L4 7Z"/><path d="M7.5 7V5.5a2.5 2.5 0 0 1 5 0V7"/></svg>
+  <span id="carritoTexto">Tu carrito</span> <b id="carritoCuenta">0</b>
+</button>
+<div class="carrito" id="carrito" hidden data-no-i18n>
+  <div class="carrito-fondo" data-cerrar-carrito></div>
+  <aside class="carrito-panel" role="dialog" aria-modal="true" aria-labelledby="carritoTitulo">
+    <div class="carrito-cabeza"><h2 id="carritoTitulo">Tu carrito</h2><button type="button" class="visor-cerrar" data-cerrar-carrito aria-label="Cerrar">×</button></div>
+    <ul class="carrito-lista" id="carritoLista"></ul>
+    <div class="carrito-pie">
+      <div class="carrito-total"><span id="carritoTotalTxt">Total</span><b id="carritoTotal">$0</b></div>
+      <a class="boton boton--lleno" href="checkout.html" id="carritoPagar">Ir a pagar <span class="flecha" aria-hidden="true">→</span></a>
+      <p class="nota-c" id="carritoNota">Pagas con Wompi, Mercado Pago, PayPal o Stripe. El acceso llega a tu correo.</p>
+      <button type="button" class="test-atras" data-cerrar-carrito id="carritoSeguir">Seguir mirando</button>
+    </div>
+  </aside>
+</div>
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 
+<script src="js/carrito.js"></script>
 <script>
 /* ============================================================
    ENLACES: pega aquí cada link cuando lo tengas.
@@ -1066,6 +1123,7 @@ function mostrarAviso(texto) {
 }
 
 document.querySelectorAll("[data-enlace]").forEach(a => {
+  if (["metodoMente", "movimiento", "recetario", "mensajes", "diario", "pack"].includes(a.dataset.enlace)) return; // van al carrito
   const datos = ENLACES[a.dataset.enlace];
   if (datos && datos.url) {
     a.href = datos.url;
@@ -1570,6 +1628,94 @@ else start();
     if (e.key === "Tab") { e.preventDefault(); cerrarBtn.focus(); }
   });
   window.addEventListener("resize", function () { if (!visor.hidden) medir(); });
+})();
+</script>
+
+<script>
+/* ---------- Carrito: los botones Comprar agregan al carrito y llevan a checkout.html ---------- */
+(function () {
+  var C = window.SlumenCarrito;
+  if (!C) return;
+  var MAPA = { metodoMente: "metodo", movimiento: "movimiento", recetario: "recetario", mensajes: "mensajes", diario: "diario", pack: "pack" };
+  var $ = function (id) { return document.getElementById(id); };
+  var panel = $("carrito"), flotante = $("carritoBoton");
+  var origen = null;
+  function en() { return window.SLUMEN_I18N && SLUMEN_I18N.lang === "en"; }
+  function t(es, ing) { return en() ? ing : es; }
+
+  function pintar() {
+    var moneda = en() ? "USD" : "COP";
+    var lineas = C.lineas(moneda, en() ? "en" : "es");
+    var n = lineas.length;
+    flotante.hidden = n === 0;
+    $("carritoTexto").textContent = t("Tu carrito", "Your cart");
+    $("carritoCuenta").textContent = n;
+    flotante.setAttribute("aria-label", t("Abrir tu carrito, ", "Open your cart, ") + n + t(n === 1 ? " producto" : " productos", n === 1 ? " item" : " items"));
+    $("carritoTitulo").textContent = t("Tu carrito", "Your cart");
+    $("carritoTotalTxt").textContent = "Total";
+    $("carritoPagar").innerHTML = t("Ir a pagar", "Go to checkout") + ' <span class="flecha" aria-hidden="true">→</span>';
+    $("carritoNota").textContent = t("Pagas con Wompi, Mercado Pago, PayPal o Stripe. El acceso llega a tu correo.", "Pay with Wompi, Mercado Pago, PayPal or Stripe. Your access arrives by email.");
+    $("carritoSeguir").textContent = t("Seguir mirando", "Keep browsing");
+    panel.querySelector(".visor-cerrar").setAttribute("aria-label", t("Cerrar", "Close"));
+    var ul = $("carritoLista"); ul.innerHTML = "";
+    var total = 0;
+    if (!n) {
+      var vacio = document.createElement("li");
+      vacio.className = "carrito-vacio"; vacio.style.display = "block";
+      vacio.textContent = t("Todavía no has agregado nada.", "You haven’t added anything yet.");
+      ul.appendChild(vacio);
+    }
+    lineas.forEach(function (l) {
+      total += l.valor;
+      var li = document.createElement("li");
+      li.innerHTML = '<span><span class="n"></span><br><span class="e"></span></span><span class="v"><s></s><span></span></span><button type="button" class="q"></button>';
+      li.querySelector(".n").textContent = l.nombre;
+      li.querySelector(".e").textContent = l.incluye ? t("Incluye los 5 productos", "Includes all 5 products") : l.eje;
+      li.querySelector("s").textContent = C.precio(l.antes, moneda);
+      li.querySelector(".v span").textContent = C.precio(l.valor, moneda);
+      var q = li.querySelector(".q");
+      q.textContent = t("Quitar", "Remove");
+      q.addEventListener("click", function () { C.quitar(l.id); });
+      ul.appendChild(li);
+    });
+    $("carritoTotal").textContent = C.precio(total, moneda) + (moneda === "USD" ? "" : " COP");
+    $("carritoPagar").hidden = n === 0;
+  }
+
+  function abrir() {
+    origen = document.activeElement;
+    pintar();
+    panel.hidden = false;
+    document.body.classList.add("carrito-abierto");
+    panel.querySelector(".visor-cerrar").focus();
+  }
+  function cerrar() {
+    if (panel.hidden) return;
+    panel.hidden = true;
+    document.body.classList.remove("carrito-abierto");
+    if (origen && origen.focus) origen.focus();
+  }
+
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-enlace]");
+    if (a && MAPA[a.dataset.enlace]) {
+      e.preventDefault();
+      var id = MAPA[a.dataset.enlace];
+      C.cargar().then(function () {
+        var r = C.agregar(id);
+        if (r === "incluido") mostrarAviso(t("Ya viene incluido en el Pack Vuelve a ti.", "It’s already included in the Return to Yourself Pack."));
+        flotante.classList.remove("salta"); void flotante.offsetWidth; flotante.classList.add("salta");
+        abrir();
+      });
+      return;
+    }
+    if (e.target.closest("#carritoBoton")) { C.cargar().then(abrir); return; }
+    if (e.target.closest("[data-cerrar-carrito]")) cerrar();
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") cerrar(); });
+  window.addEventListener("slumencarrito", pintar);
+  window.addEventListener("slumenlang", pintar);
+  if (C.leer().length) C.cargar().then(pintar);
 })();
 </script>
 
