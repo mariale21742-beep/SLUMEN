@@ -92,6 +92,9 @@ button, input, select { font: inherit; color: inherit; }
 .nota p { margin: 0; display: flex; gap: 8px; }
 .nota p::before { content: "✦"; color: var(--dorado-claro); }
 .pagar { width: 100%; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--texto-suave); line-height: 1.45; }
+.consent input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--dorado); flex: none; }
+.consent a { color: var(--texto); }
 .error { color: var(--error); font-weight: 600; font-size: 14px; margin: 0; min-height: 1em; }
 .aviso-preview { font-size: 13px; background: var(--rosa-suave); border-radius: 14px; padding: 12px 14px; margin: 0; }
 .vacio { text-align: center; display: grid; gap: 16px; justify-items: center; padding: 40px 20px; }

@@ -43,6 +43,8 @@
     <form id="formulario" class="pago-rejilla" novalidate hidden>
       <div class="tarjeta">
         <div class="paso"><b>1</b><h2 data-t="datos">Tus datos</h2></div>
+        <p class="aviso-preview" id="conCuenta" hidden style="background:var(--turquesa-suave)"></p>
+        <p class="nota" id="yaTienes" style="margin:0"><span data-t="yaTienes">¿Ya compraste antes?</span> <a href="cuenta.html?volver=/checkout.html" data-t="entraCuenta">Entra a tu cuenta</a></p>
         <div class="campos">
           <div class="campo campo--ancho">
             <label for="nombre" data-t="nombre">Nombre completo</label>
@@ -70,6 +72,8 @@
         <div class="paso"><b>3</b><h2 id="resumenTitulo" data-t="resumen">Tu pedido</h2></div>
         <ul class="lineas" id="lineas"></ul>
         <div class="total"><span data-t="total">Total</span><div><b id="total">$0</b><small id="moneda">COP</small></div></div>
+        <label class="consent"><input type="checkbox" id="acepta"> <span><span data-t="acepto">Acepto la</span> <a href="politica-de-datos.html" target="_blank" data-t="politica">política de tratamiento de datos</a>.</span></label>
+        <label class="consent"><input type="checkbox" id="novedades"> <span data-t="novedades">Quiero recibir novedades y descuentos (opcional).</span></label>
         <button class="boton boton--lleno pagar" id="pagar" type="submit"><span id="pagarTexto">Pagar</span> <span aria-hidden="true">→</span></button>
         <p class="error" id="error" role="alert"></p>
         <div class="nota">
@@ -92,7 +96,9 @@
       medio: "Cómo quieres pagar", medioLeyenda: "Medio de pago",
       preview: "Vista previa: los pagos se activan cuando la página esté publicada en Netlify con las llaves de cada pasarela.",
       resumen: "Tu pedido", total: "Total", pagar: "Pagar", quitar: "Quitar", abriendo: "Abriendo el pago…",
-      nota1: "Productos digitales: recibes el acceso en tu correo apenas se confirme el pago.",
+      nota1: "Productos digitales: apenas se confirme el pago se crea tu cuenta y te llega el acceso al correo.",
+      yaTienes: "¿Ya compraste antes?", entraCuenta: "Entra a tu cuenta", acepto: "Acepto la", politica: "política de tratamiento de datos",
+      novedades: "Quiero recibir novedades y descuentos (opcional).", errAcepta: "Acepta la política de datos para continuar.", conCuenta: "Comprando con tu cuenta:",
       nota2: "Pagas en la página segura de la pasarela que elijas. Slumen no guarda los datos de tu tarjeta.",
       errNombre: "Escribe tu nombre.", errEmail: "Revisa tu correo: así te enviamos el acceso.", errMedio: "Elige un medio de pago.",
       errPreview: "En la vista previa no se puede pagar todavía.", errRed: "No pudimos abrir el pago. Intenta de nuevo en un momento.",
@@ -105,7 +111,9 @@
       medio: "How you want to pay", medioLeyenda: "Payment method",
       preview: "Preview: payments turn on once the page is live on Netlify with each gateway’s keys.",
       resumen: "Your order", total: "Total", pagar: "Pay", quitar: "Remove", abriendo: "Opening payment…",
-      nota1: "Digital products: your access arrives by email as soon as the payment is confirmed.",
+      nota1: "Digital products: as soon as the payment is confirmed your account is created and your access arrives by email.",
+      yaTienes: "Bought before?", entraCuenta: "Sign in to your account", acepto: "I accept the", politica: "data processing policy",
+      novedades: "I want to receive news and discounts (optional).", errAcepta: "Please accept the data policy to continue.", conCuenta: "Buying with your account:",
       nota2: "You pay on the secure page of the gateway you choose. Slumen never stores your card details.",
       errNombre: "Please write your name.", errEmail: "Check your email: that’s where we send your access.", errMedio: "Choose a payment method.",
       errPreview: "Payments aren’t available in the preview yet.", errRed: "We couldn’t open the payment. Please try again in a moment.",
@@ -127,7 +135,7 @@
     document.title = (lang === "en" ? "Checkout" : "Pagar") + " · Slumen";
     document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
     document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
-    pintarMedios(); pintar();
+    pintarMedios(); pintar(); if (typeof pintarCuenta === "function") pintarCuenta();
   }
 
   function pintarMedios() {
@@ -198,12 +206,13 @@
     if (nombre.length < 2) return error(t("errNombre"), "nombre");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return error(t("errEmail"), "email");
     if (!elegida) return error(t("errMedio"));
+    if (!$("acepta").checked) return error(t("errAcepta"));
     if (activas === null) return error(t("errPreview"));
     error("");
     enviando = true; $("pagar").disabled = true; pintar();
     fetch("/api/crear-pago", {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ items: C.leer(), pasarela: elegida, comprador: { nombre: nombre, email: email, celular: celular }, idioma: lang })
+      body: JSON.stringify({ items: C.leer(), pasarela: elegida, comprador: { nombre: nombre, email: email, celular: celular }, idioma: lang, acepta: true, novedades: $("novedades").checked })
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok || !res.d.url) throw new Error(res.d && res.d.error);
@@ -212,7 +221,7 @@
       })
       .catch(function (err) {
         enviando = false; $("pagar").disabled = false; pintar();
-        error(lang === "es" && err && err.message ? err.message : t("errRed"));
+        error(err && err.message ? err.message : t("errRed"));
       });
   });
 
@@ -226,6 +235,19 @@
       try { localStorage.setItem("slumen-comprador", JSON.stringify({ nombre: $("nombre").value, email: $("email").value, celular: $("celular").value })); } catch (e) {}
     });
   });
+
+  // Si hay sesión, la compra queda en esa cuenta.
+  var cuenta = null;
+  function pintarCuenta() {
+    if (!cuenta) return;
+    $("conCuenta").hidden = false; $("yaTienes").hidden = true;
+    $("conCuenta").textContent = t("conCuenta") + " " + cuenta.email;
+    $("email").value = cuenta.email; $("email").disabled = true;
+    if (!$("nombre").value && cuenta.nombre) $("nombre").value = cuenta.nombre;
+    if (!$("celular").value && cuenta.celular) $("celular").value = cuenta.celular;
+  }
+  fetch("/api/yo", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { if (d && d.usuario) { cuenta = d.usuario; pintarCuenta(); } }).catch(function () {});
 
   Promise.all([
     C.cargar(),

@@ -62,13 +62,14 @@
     var texto = x[2];
     if (estado === "aprobado") {
       texto = es
-        ? "Te enviamos el acceso a tus productos" + (datos && datos.email ? " a " + datos.email : " a tu correo") + ". Si no lo ves en unos minutos, revisa la carpeta de spam o promociones."
-        : "We sent your access" + (datos && datos.email ? " to " + datos.email : " to your email") + ". If you don’t see it in a few minutes, check your spam or promotions folder.";
+        ? "Tus productos ya están en tu cuenta. También te enviamos un correo" + (datos && datos.email ? " a " + datos.email : "") + " con un botón para entrar sin contraseña."
+        : "Your products are already in your account. We also emailed you" + (datos && datos.email ? " at " + datos.email : "") + " a button to sign in without a password.";
     }
     $("texto").textContent = texto;
     var acc = $("acciones"); acc.innerHTML = "";
     if (estado === "rechazado") acc.append(boton(es ? "Intentar de nuevo →" : "Try again →", "checkout.html", true));
-    if (estado !== "verificando") acc.append(boton(es ? "Volver a Slumen" : "Back to Slumen", "index.html", estado !== "rechazado"));
+    if (estado === "aprobado") acc.append(boton(es ? "Ir a mis productos →" : "Go to my products →", "cuenta.html", true));
+    if (estado !== "verificando") acc.append(boton(es ? "Volver a Slumen" : "Back to Slumen", "index.html", estado === "pendiente" || estado === "desconocido"));
     if (estado === "aprobado" || estado === "pendiente") C.vaciar();
   }
 

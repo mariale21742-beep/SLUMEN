@@ -1,11 +1,34 @@
-# Sitio estático + funciones de Netlify (carpeta netlify/functions).
+# Sitio estático + funciones de Netlify (carpeta netlify/functions) + PostgreSQL.
 [build]
   publish = "."
 
 [functions]
   node_bundler = "esbuild"
 
+# Los productos pagados solo se sirven a través de la función "producto" (con sesión y compra).
+[functions.producto]
+  included_files = ["privado/**"]
+
+# Nadie puede abrir directamente los archivos privados ni el código del servidor.
+[[redirects]]
+  from = "/privado/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
 [[headers]]
   for = "/catalogo.json"
   [headers.values]
     Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

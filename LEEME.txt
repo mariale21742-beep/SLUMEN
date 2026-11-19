@@ -1,4 +1,4 @@
-SLUMEN · Página web con carrito y pagos
+SLUMEN · Página web con carrito, pagos, cuentas y productos privados
 =======================================
 
 Qué hay en esta carpeta
@@ -6,11 +6,18 @@ Qué hay en esta carpeta
                           Los botones "Comprar" agregan al carrito.
 - checkout.html ......... Página de pago: datos de quien compra, medio de pago y resumen del pedido.
 - gracias.html .......... Página a la que vuelve la persona después de pagar. Confirma el pago.
+- cuenta.html ........... Mi cuenta: entrar con el correo, Mis productos, Mis compras y Mi perfil.
+- entrar.html ........... Abre la sesión desde el enlace que llega al correo.
+- politica-de-datos.html  BORRADOR de la política de tratamiento de datos (Ley 1581). Completar y revisar con abogado.
+- 404.html .............. Página para rutas que no existen.
+- privado/productos/ .... LOS PRODUCTOS PAGADOS (Método, Movimiento, Recetario, Mensajes de Dios, Diario).
+                          Nadie puede abrirlos directamente: solo se sirven por /productos/<id>/ a quien los compró.
+- sql/esquema.sql ....... Tablas de la base de datos PostgreSQL (se crean solas al primer uso).
 - catalogo.json ......... PRECIOS de cada producto en COP y USD (el servidor cobra con estos valores).
 - js/carrito.js ......... Carrito compartido por las tres páginas.
 - css/pago.css .......... Estilos de checkout y gracias.
 - netlify/functions/ .... Funciones del servidor (crear pago, confirmar, webhooks).
-- netlify/lib/ .......... Código compartido: pasarelas, pedidos y correo.
+- netlify/lib/ .......... Código compartido: base de datos, sesiones, pasarelas, pedidos y correo.
 - img/ .................. Logo, foto de Aleja y capturas de cada producto (img/recorrido/).
 - Guia-Vuelve-a-ti-Slumen.pdf  Guía gratuita.
 
@@ -23,8 +30,23 @@ Cómo funciona la compra
      Stripe ....... USD
 3. El servidor calcula el total con catalogo.json, guarda el pedido y la envía a la página segura de la pasarela.
 4. Al volver a gracias.html (y también por webhook), el servidor CONSULTA el pago en la pasarela.
-   Si está aprobado y el monto coincide, envía el correo con los accesos y un aviso de venta a Aleja.
-   El correo se envía una sola vez por pedido. Si el monto no coincide, el pedido queda en "revisar" y Aleja recibe un aviso.
+   Si está aprobado y el monto coincide:
+     - crea la cuenta de la persona con su correo (o usa la que ya tenía),
+     - le da acceso a los productos comprados (el Pack da acceso a los cinco),
+     - le envía un correo con el botón "Entrar a mi cuenta" (sirve 3 días, sin contraseña) y los enlaces a cada producto,
+     - y envía a Aleja el aviso de la venta.
+   Todo ocurre una sola vez por pedido. Si el monto no coincide, el pedido queda en "revisar", no se entrega nada y Aleja recibe un aviso.
+5. Después, la persona entra cuando quiera en /cuenta.html: escribe su correo y recibe un enlace de acceso (30 minutos, un solo uso).
+   Ahí ve Mis productos, Mis compras (historial con estado) y Mi perfil (nombre, celular, país, idioma, novedades).
+6. Cada producto vive en /productos/<id>/ (metodo, movimiento, recetario, mensajes, diario). Si no hay sesión, pide entrar;
+   si la persona no lo compró, la lleva a su cuenta con un aviso.
+
+Cuentas y seguridad
+- Sin contraseñas: se entra con un enlace que llega al correo (más simple para la clienta y nada que se pueda filtrar).
+- La sesión es una cookie HttpOnly de 30 días. En la base solo se guarda el hash de cada token, nunca el token.
+- Máximo 5 enlaces de acceso por correo por hora.
+- Si la persona compra con la sesión abierta, el pedido queda en su cuenta aunque escriba otro correo.
+- Checkout y Mi cuenta piden aceptar la política de datos; la fecha de aceptación queda guardada.
 Solo aparecen en el checkout las pasarelas que tengan sus llaves configuradas.
 
 ---------------------------------------------------------------------
@@ -44,11 +66,11 @@ Variables de entorno
   EMAIL_REMITENTE ......... Slumen <hola@tudominio.com>   (el dominio debe estar verificado en Resend)
   EMAIL_AVISO ............. correo de Aleja: recibe el aviso de cada venta y las respuestas de clientes.
 
-  Acceso a cada producto (el enlace que se envía en el correo; si falta, el correo dice que Aleja lo enviará):
-  ACCESO_METODO, ACCESO_MOVIMIENTO, ACCESO_RECETARIO, ACCESO_MENSAJES, ACCESO_DIARIO
-  IMPORTANTE: hoy los productos están como páginas privadas de Claude que solo Aleja puede abrir.
-  Hay que publicarlos (por ejemplo en este mismo Netlify, en rutas difíciles de adivinar o con contraseña)
-  y poner aquí esos enlaces.
+  Base de datos PostgreSQL (OBLIGATORIA para pedidos, cuentas y productos):
+  DATABASE_URL ............ postgres://usuario:clave@host/base?sslmode=require
+                            Opciones: Netlify DB (Extensions > Neon; crea NETLIFY_DATABASE_URL sola, también sirve),
+                            Neon (neon.tech) o Supabase (usar la cadena "connection pooling", puerto 6543).
+                            Las tablas se crean solas la primera vez (ver sql/esquema.sql).
 
   Wompi (https://comercios.wompi.co -> Desarrolladores):
   WOMPI_PUBLIC_KEY ........ pub_test_... (pruebas) o pub_prod_... (real). El entorno se detecta por la llave.
@@ -72,9 +94,23 @@ Variables de entorno
                             Eventos: checkout.session.completed y checkout.session.async_payment_succeeded
   Nota: Stripe no abre cuentas para empresas en Colombia; se necesita una empresa en un país soportado (p. ej. EE. UU.).
 
-Pedidos
-- Cada pedido se guarda en Netlify Blobs (almacén "pedidos") con su estado: creado, pendiente, aprobado, entregado o revisar.
-- La referencia (SLM-...) aparece en el correo, en el aviso de venta y en el panel de cada pasarela.
+Base de datos (tablas)
+- usuarios ........ correo, nombre, celular, país, idioma, novedades, fecha de aceptación de datos, último acceso.
+- pedidos ......... referencia SLM-..., cuenta, pasarela, moneda, total, productos, estado
+                    (creado, pendiente, rechazado, entregando, entregado, revisar, error_entrega), fechas y respuesta de la pasarela.
+- accesos ......... qué producto tiene cada cuenta, desde qué pedido, y último uso.
+- sesiones ........ sesiones abiertas (solo hash del token).
+- enlaces_acceso .. enlaces de entrada enviados por correo (solo hash, vencen solos).
+Consultas útiles (en la consola SQL de Neon/Supabase):
+  select ref, email, total, moneda, estado, creado from pedidos order by creado desc limit 50;
+  select u.email, a.producto, a.otorgado from accesos a join usuarios u on u.id = a.usuario_id order by a.otorgado desc;
+  -- Dar acceso a mano (por ejemplo, un regalo):
+  insert into usuarios (email) values ('correo@ejemplo.com') on conflict (email) do nothing;
+  insert into accesos (usuario_id, producto) select id, 'diario' from usuarios where email = 'correo@ejemplo.com' on conflict do nothing;
+- La referencia (SLM-...) aparece en el correo, en el aviso de venta, en Mis compras y en el panel de cada pasarela.
+
+Cambiar un producto
+- Reemplaza privado/productos/<id>/index.html (y sus imágenes en la misma carpeta) y vuelve a desplegar.
 
 Probar antes de cobrar de verdad
 - Usar llaves de prueba (Wompi pub_test_, Mercado Pago de prueba, PayPal sandbox, Stripe sk_test_).

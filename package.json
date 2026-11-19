@@ -2,8 +2,8 @@
   "name": "slumen-web",
   "private": true,
   "type": "module",
-  "description": "Página de Slumen con carrito y pagos (Wompi, Mercado Pago, PayPal, Stripe) en Netlify.",
+  "description": "Página de Slumen: carrito, pagos (Wompi, Mercado Pago, PayPal, Stripe), cuentas y productos privados en Netlify + PostgreSQL.",
   "dependencies": {
-    "@netlify/blobs": "^8.1.0"
+    "postgres": "^3.4.5"
   }
 }

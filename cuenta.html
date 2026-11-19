@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi cuenta · Slumen</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/pago.css">
+<style>
+.cuenta { padding: clamp(28px, 5vw, 56px) 0 80px; }
+.entrada { max-width: 520px; margin: 0 auto; }
+.entrada h1 { font-size: clamp(40px, 6vw, 58px); }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--texto-suave); }
+.consent input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--dorado); flex: none; }
+.consent a { color: var(--texto); }
+.aviso-suave { background: var(--lavanda-suave); border-radius: 16px; padding: 14px 16px; font-size: 15px; margin: 0; }
+.saludo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: clamp(24px, 4vw, 40px); }
+.saludo h1 { font-size: clamp(42px, 6vw, 66px); }
+.salir { background: none; border: 0; padding: 0; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.pestanas { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
+.pestanas button { border: 1px solid var(--linea); background: var(--hoja); border-radius: 999px; padding: 10px 18px; font: 700 14px/1 var(--f-cuerpo); cursor: pointer; }
+.pestanas button[aria-selected="true"] { background: var(--texto); color: var(--marfil); border-color: var(--texto); }
+.mis-productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.prod { background: var(--hoja); border: 1px solid var(--linea); border-radius: 22px; padding: 22px; display: grid; gap: 10px; align-content: start; text-decoration: none; transition: transform .4s var(--lento), border-color .3s; }
+.prod:hover { transform: translateY(-3px); border-color: var(--dorado); }
+.prod h3 { font-size: 26px; }
+.prod .meta { font-size: 13px; color: var(--texto-suave); }
+.prod .abrir { font-weight: 700; color: var(--dorado); }
+.prod--mente { background: linear-gradient(160deg, var(--lavanda-suave), var(--hoja) 60%); }
+.prod--cuerpo { background: linear-gradient(160deg, var(--rosa-suave), var(--hoja) 60%); }
+.prod--espiritu { background: linear-gradient(160deg, var(--turquesa-suave), var(--hoja) 60%); }
+.compras { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.compra { background: var(--hoja); border: 1px solid var(--linea); border-radius: 20px; padding: 18px 20px; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; }
+.compra .fecha { font-weight: 700; }
+.compra .ref { font-size: 13px; color: var(--texto-suave); }
+.compra .items { grid-column: 1 / -1; font-size: 15px; }
+.compra .total { text-align: right; font-weight: 800; border: 0; padding: 0; display: block; }
+.estado { display: inline-block; font: 800 11px/1 var(--f-cuerpo); letter-spacing: .12em; text-transform: uppercase; padding: 6px 9px; border-radius: 999px; background: var(--lavanda-suave); }
+.estado--ok { background: var(--turquesa); }
+.estado--mal { background: var(--rosa-suave); }
+.perfil { max-width: 640px; }
+.campo select { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--linea); background: #fff; font-size: 16px; }
+.guardado { font-weight: 700; color: var(--dorado); margin: 0; min-height: 1.2em; }
+.vacio-c { text-align: center; padding: 34px 20px; display: grid; gap: 14px; justify-items: center; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a href="index.html" aria-label="Slumen, inicio"><img src="img/nombre.png" alt="Slumen" width="372" height="92"></a>
+    <div class="cabecera-der">
+      <a class="volver" href="index.html#tres-ejes" data-t="tienda">Ver productos</a>
+      <div class="idiomas" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="cuenta">
+  <div class="envoltura">
+
+    <p id="cargando" class="nota" style="text-align:center" data-t="cargando">Cargando tu espacio…</p>
+
+    <!-- Entrar -->
+    <section id="vistaEntrar" class="entrada" hidden>
+      <form id="formEntrar" class="tarjeta" novalidate>
+        <span class="etiqueta" data-t="miCuenta">Mi cuenta</span>
+        <h1 data-t="entrarTitulo">Vuelve a tu espacio.</h1>
+        <p data-t="entrarTexto">Escribe el correo con el que compraste. Te enviamos un enlace para entrar, sin contraseñas.</p>
+        <p class="aviso-suave" id="sinAcceso" hidden></p>
+        <div class="campo">
+          <label for="correo" data-t="correo">Correo</label>
+          <input id="correo" type="email" autocomplete="email" required maxlength="120">
+        </div>
+        <label class="consent"><input type="checkbox" id="acepta"> <span><span data-t="acepto">Acepto la</span> <a href="politica-de-datos.html" target="_blank" data-t="politica">política de tratamiento de datos</a>.</span></label>
+        <button class="boton boton--lleno pagar" type="submit" id="botonEntrar"><span data-t="enviarEnlace">Enviarme el enlace</span> <span aria-hidden="true">→</span></button>
+        <p class="error" id="errorEntrar" role="alert"></p>
+        <p class="aviso-preview" id="avisoPreview" hidden data-t="preview">Vista previa: las cuentas se activan cuando la página esté publicada en Netlify con la base de datos conectada.</p>
+      </form>
+    </section>
+
+    <!-- Enlace enviado -->
+    <section id="vistaEnviado" class="entrada" hidden>
+      <div class="tarjeta" style="text-align:center;justify-items:center">
+        <div class="sol" aria-hidden="true" style="width:56px;height:56px;border-radius:50%;background:radial-gradient(circle,#fff6c9 0,var(--dorado-claro) 70%)"></div>
+        <span class="etiqueta" data-t="revisa">Revisa tu correo</span>
+        <h1 style="font-size:clamp(36px,5vw,50px)" data-t="enviadoTitulo">Te enviamos un enlace.</h1>
+        <p><span data-t="enviadoTexto">Abre el correo que llegó a</span> <b id="correoEnviado"></b> <span data-t="enviadoTexto2">y toca «Entrar a Slumen». Vence en 30 minutos.</span></p>
+        <p class="nota" data-t="spam">¿No llega? Revisa spam o promociones.</p>
+        <button type="button" class="salir" id="otroCorreo" data-t="otroCorreo">Usar otro correo</button>
+      </div>
+    </section>
+
+    <!-- Cuenta -->
+    <section id="vistaCuenta" hidden>
+      <div class="saludo">
+        <div style="display:grid;gap:10px">
+          <span class="etiqueta" data-t="miCuenta">Mi cuenta</span>
+          <h1 id="hola"></h1>
+        </div>
+        <button type="button" class="salir" id="salir" data-t="salir">Cerrar sesión</button>
+      </div>
+
+      <div class="pestanas" role="tablist">
+        <button type="button" role="tab" data-tab="productos" aria-selected="true" data-t="tabProductos">Mis productos</button>
+        <button type="button" role="tab" data-tab="compras" aria-selected="false" data-t="tabCompras">Mis compras</button>
+        <button type="button" role="tab" data-tab="perfil" aria-selected="false" data-t="tabPerfil">Mi perfil</button>
+      </div>
+
+      <div data-panel="productos" role="tabpanel"><div id="misProductos" class="mis-productos"></div></div>
+      <div data-panel="compras" role="tabpanel" hidden><ul id="misCompras" class="compras"></ul></div>
+      <div data-panel="perfil" role="tabpanel" hidden>
+        <form id="formPerfil" class="tarjeta perfil" novalidate>
+          <div class="campos">
+            <div class="campo campo--ancho"><label for="pNombre" data-t="nombre">Nombre</label><input id="pNombre" autocomplete="name" maxlength="80"></div>
+            <div class="campo"><label for="pCorreo" data-t="correo">Correo</label><input id="pCorreo" disabled></div>
+            <div class="campo"><label for="pCelular" data-t="celular">Celular</label><input id="pCelular" type="tel" autocomplete="tel" maxlength="20"></div>
+            <div class="campo"><label for="pPais" data-t="pais">País</label><input id="pPais" autocomplete="country-name" maxlength="60"></div>
+            <div class="campo"><label for="pIdioma" data-t="idioma">Idioma de los correos</label><select id="pIdioma"><option value="es">Español</option><option value="en">English</option></select></div>
+          </div>
+          <label class="consent"><input type="checkbox" id="pNovedades"> <span data-t="novedades">Quiero recibir novedades, descuentos y fechas de encuentros.</span></label>
+          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+            <button class="boton boton--lleno" type="submit" data-t="guardar">Guardar</button>
+            <p class="guardado" id="guardado" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+(function () {
+  var T = {
+    es: {
+      tienda: "Ver productos", cargando: "Cargando tu espacio…", miCuenta: "Mi cuenta", entrarTitulo: "Vuelve a tu espacio.",
+      entrarTexto: "Escribe el correo con el que compraste. Te enviamos un enlace para entrar, sin contraseñas.",
+      correo: "Correo", acepto: "Acepto la", politica: "política de tratamiento de datos", enviarEnlace: "Enviarme el enlace",
+      preview: "Vista previa: las cuentas se activan cuando la página esté publicada en Netlify con la base de datos conectada.",
+      revisa: "Revisa tu correo", enviadoTitulo: "Te enviamos un enlace.", enviadoTexto: "Abre el correo que llegó a",
+      enviadoTexto2: "y toca «Entrar a Slumen». Vence en 30 minutos.", spam: "¿No llega? Revisa spam o promociones.", otroCorreo: "Usar otro correo",
+      salir: "Cerrar sesión", tabProductos: "Mis productos", tabCompras: "Mis compras", tabPerfil: "Mi perfil",
+      nombre: "Nombre", celular: "Celular", pais: "País", idioma: "Idioma de los correos",
+      novedades: "Quiero recibir novedades, descuentos y fechas de encuentros.", guardar: "Guardar", guardado: "Guardado ✓",
+      hola: "Hola", abrir: "Abrir", desde: "Tuyo desde el", sinProductos: "Todavía no tienes productos.", sinProductosTxt: "Cuando compres, aparecen aquí para siempre.",
+      verProductos: "Ver productos", sinCompras: "Aún no tienes compras.", pedido: "Pedido",
+      errCorreo: "Revisa tu correo.", errAcepta: "Acepta la política de datos para continuar.", errRed: "No pudimos enviar el correo. Intenta de nuevo.",
+      sinAcceso: "Este producto todavía no está en tu cuenta. Si ya lo compraste, entra con el mismo correo de la compra.",
+      estados: { entregado: "Pagado", aprobado: "Pagado", entregando: "Pagado", pendiente: "En proceso", creado: "Sin pagar", rechazado: "No se completó", revisar: "En revisión", error_entrega: "En revisión" }
+    },
+    en: {
+      tienda: "See products", cargando: "Loading your space…", miCuenta: "My account", entrarTitulo: "Come back to your space.",
+      entrarTexto: "Write the email you used to buy. We’ll send you a link to sign in, no passwords.",
+      correo: "Email", acepto: "I accept the", politica: "data processing policy", enviarEnlace: "Send me the link",
+      preview: "Preview: accounts turn on once the page is live on Netlify with the database connected.",
+      revisa: "Check your email", enviadoTitulo: "We sent you a link.", enviadoTexto: "Open the email we sent to",
+      enviadoTexto2: "and tap “Enter Slumen”. It expires in 30 minutes.", spam: "Not there? Check spam or promotions.", otroCorreo: "Use another email",
+      salir: "Sign out", tabProductos: "My products", tabCompras: "My purchases", tabPerfil: "My profile",
+      nombre: "Name", celular: "Phone", pais: "Country", idioma: "Email language",
+      novedades: "I want to receive news, discounts and gathering dates.", guardar: "Save", guardado: "Saved ✓",
+      hola: "Hi", abrir: "Open", desde: "Yours since", sinProductos: "You don’t have products yet.", sinProductosTxt: "When you buy, they appear here for good.",
+      verProductos: "See products", sinCompras: "No purchases yet.", pedido: "Order",
+      errCorreo: "Check your email.", errAcepta: "Please accept the data policy to continue.", errRed: "We couldn’t send the email. Please try again.",
+      sinAcceso: "This product isn’t in your account yet. If you already bought it, sign in with the email you used to pay.",
+      estados: { entregado: "Paid", aprobado: "Paid", entregando: "Paid", pendiente: "In progress", creado: "Unpaid", rechazado: "Not completed", revisar: "Under review", error_entrega: "Under review" }
+    }
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  var q = new URLSearchParams(location.search);
+  var lang = "es";
+  try { var l = localStorage.getItem("slumen-lang"); if (l === "en" || l === "es") lang = l; else if (/^en/i.test(navigator.language)) lang = "en"; } catch (e) {}
+  var datos = null;
+  function t(k) { return (T[lang] && T[lang][k] != null) ? T[lang][k] : T.es[k]; }
+  function fecha(d) { try { return new Date(d).toLocaleDateString(lang === "en" ? "en-US" : "es-CO", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return ""; } }
+  function precio(v, m) { return m === "USD" ? "US$" + (v / 100).toFixed(2) : "$" + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " COP"; }
+  function ejeClase(eje) { var e = (eje && eje[0] || "").toLowerCase(); return e.indexOf("mente") === 0 ? "mente" : e.indexOf("cuerpo") === 0 ? "cuerpo" : "espiritu"; }
+
+  function mostrar(v) {
+    $("cargando").hidden = true;
+    ["vistaEntrar", "vistaEnviado", "vistaCuenta"].forEach(function (id) { $(id).hidden = id !== v; });
+  }
+
+  function idioma(l) {
+    lang = l === "en" ? "en" : "es";
+    try { localStorage.setItem("slumen-lang", lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    document.title = (lang === "en" ? "My account" : "Mi cuenta") + " · Slumen";
+    document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
+    document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
+    if (q.get("sin_acceso")) { $("sinAcceso").hidden = false; $("sinAcceso").textContent = t("sinAcceso"); }
+    if (datos) pintarCuenta();
+  }
+
+  function pintarCuenta() {
+    var u = datos.usuario;
+    $("hola").textContent = t("hola") + (u.nombre ? ", " + u.nombre.split(" ")[0] : "") + ".";
+    var cont = $("misProductos"); cont.innerHTML = "";
+    if (!datos.productos.length) {
+      cont.innerHTML = '<div class="tarjeta vacio-c" style="grid-column:1/-1"><h2></h2><p></p><a class="boton boton--lleno" href="index.html#tres-ejes"></a></div>';
+      cont.querySelector("h2").textContent = t("sinProductos");
+      cont.querySelector("p").textContent = t("sinProductosTxt");
+      cont.querySelector("a").textContent = t("verProductos") + " →";
+    }
+    datos.productos.forEach(function (p) {
+      var a = document.createElement("a");
+      a.className = "prod prod--" + ejeClase(p.eje);
+      a.href = p.url;
+      a.innerHTML = '<span class="etiqueta"></span><h3></h3><span class="meta"></span><span class="abrir"></span>';
+      a.querySelector(".etiqueta").textContent = p.eje[lang === "en" ? 1 : 0];
+      a.querySelector("h3").textContent = lang === "en" ? p.en : p.es;
+      a.querySelector(".meta").textContent = t("desde") + " " + fecha(p.otorgado);
+      a.querySelector(".abrir").textContent = t("abrir") + " →";
+      cont.appendChild(a);
+    });
+    var ul = $("misCompras"); ul.innerHTML = "";
+    if (!datos.pedidos.length) { var li0 = document.createElement("li"); li0.className = "nota"; li0.textContent = t("sinCompras"); ul.appendChild(li0); }
+    datos.pedidos.forEach(function (p) {
+      var li = document.createElement("li");
+      li.className = "compra";
+      var ok = ["entregado", "aprobado", "entregando"].indexOf(p.estado) >= 0, mal = p.estado === "rechazado";
+      li.innerHTML = '<div><span class="fecha"></span><br><span class="ref"></span></div><div style="text-align:right"><span class="total"></span><span class="estado"></span></div><div class="items"></div>';
+      li.querySelector(".fecha").textContent = fecha(p.pagado || p.creado);
+      li.querySelector(".ref").textContent = t("pedido") + " " + p.ref + " · " + p.pasarela;
+      li.querySelector(".total").textContent = precio(p.total, p.moneda);
+      var est = li.querySelector(".estado");
+      est.textContent = (t("estados")[p.estado] || p.estado);
+      est.className = "estado" + (ok ? " estado--ok" : mal ? " estado--mal" : "");
+      li.querySelector(".items").textContent = (p.lineas || []).map(function (x) { return x.nombre; }).join(" · ");
+      ul.appendChild(li);
+    });
+    $("pNombre").value = u.nombre || ""; $("pCorreo").value = u.email; $("pCelular").value = u.celular || "";
+    $("pPais").value = u.pais || ""; $("pIdioma").value = u.idioma || "es"; $("pNovedades").checked = !!u.acepta_novedades;
+  }
+
+  document.querySelectorAll("[role=tab]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("[role=tab]").forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); });
+      document.querySelectorAll("[data-panel]").forEach(function (p) { p.hidden = p.dataset.panel !== b.dataset.tab; });
+    });
+  });
+
+  $("formEntrar").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var correo = $("correo").value.trim();
+    $("errorEntrar").textContent = "";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) { $("errorEntrar").textContent = t("errCorreo"); $("correo").focus(); return; }
+    if (!$("acepta").checked) { $("errorEntrar").textContent = t("errAcepta"); return; }
+    $("botonEntrar").disabled = true;
+    fetch("/api/auth/enlace", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: correo, acepta: true, idioma: lang, volver: q.get("volver") || "/cuenta.html" }) })
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error); }); })
+      .then(function () { $("correoEnviado").textContent = correo; mostrar("vistaEnviado"); })
+      .catch(function (err) { $("errorEntrar").textContent = (err && err.message) || t("errRed"); })
+      .then(function () { $("botonEntrar").disabled = false; });
+  });
+  $("otroCorreo").addEventListener("click", function () { mostrar("vistaEntrar"); $("correo").focus(); });
+
+  $("formPerfil").addEventListener("submit", function (e) {
+    e.preventDefault();
+    fetch("/api/perfil", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
+      nombre: $("pNombre").value, celular: $("pCelular").value, pais: $("pPais").value, idioma: $("pIdioma").value, acepta_novedades: $("pNovedades").checked
+    }) }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.usuario) { datos.usuario = d.usuario; pintarCuenta(); $("guardado").textContent = t("guardado"); setTimeout(function () { $("guardado").textContent = ""; }, 2500); }
+    });
+  });
+
+  $("salir").addEventListener("click", function () {
+    fetch("/api/auth/salir", { method: "POST" }).then(function () { datos = null; mostrar("vistaEntrar"); });
+  });
+
+  document.querySelectorAll("[data-lang]").forEach(function (b) { b.addEventListener("click", function () { idioma(b.dataset.lang); }); });
+  idioma(lang);
+
+  fetch("/api/yo", { cache: "no-store" }).then(function (r) {
+    if (r.status === 401) { mostrar("vistaEntrar"); return; }
+    if (!r.ok) throw new Error("sin servidor");
+    return r.json().then(function (d) { datos = d; pintarCuenta(); mostrar("vistaCuenta"); });
+  }).catch(function () { $("avisoPreview").hidden = false; mostrar("vistaEntrar"); });
+})();
+</script>
+</body>
+</html>

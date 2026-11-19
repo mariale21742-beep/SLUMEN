@@ -1,5 +1,5 @@
 // Correos con Resend (https://resend.com): acceso para quien compra y aviso de venta para Aleja.
-import { env } from "./util.mjs";
+import { env, sitioUrl } from "./util.mjs";
 import { PRODUCTOS, productosAEntregar } from "./catalogo.mjs";
 
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -25,40 +25,50 @@ const marco = cuerpo => `<!doctype html><html><body style="margin:0;background:#
 <tr><td style="padding:0 32px 28px;font-size:13px;color:#7A6A60">Slumen · Reconecta con tu ser</td></tr>
 </table></td></tr></table></body></html>`;
 
-export async function enviarAcceso(pedido) {
+const boton = (url, texto) => `<a href="${esc(url)}" style="display:inline-block;background:#826643;color:#F8F3EB;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:999px">${texto}</a>`;
+
+// Correo después de pagar: lista de productos y enlace para entrar a la cuenta sin contraseña.
+export async function enviarAcceso(pedido, enlaceEntrar) {
   const en = pedido.idioma === "en";
-  const ids = productosAEntregar(pedido.items);
-  let faltan = 0;
-  const filas = ids.map(id => {
+  const filas = productosAEntregar(pedido.items).map(id => {
     const p = PRODUCTOS[id];
-    const url = env(p.acceso || "");
-    if (!url) faltan++;
-    const boton = url
-      ? `<a href="${esc(url)}" style="display:inline-block;background:#826643;color:#F8F3EB;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px">${en ? "Open" : "Entrar"} →</a>`
-      : `<span style="color:#7A6A60;font-size:14px">${en ? "Aleja will send you this access shortly." : "Aleja te enviará este acceso en breve."}</span>`;
-    return `<tr><td style="padding:14px 0;border-top:1px solid #eadfd3"><b>${esc(en ? p.en : p.es)}</b><br><span style="font-size:13px;color:#7A6A60">${esc(p.eje[en ? 1 : 0])}</span></td><td align="right" style="padding:14px 0;border-top:1px solid #eadfd3">${boton}</td></tr>`;
+    const url = `${sitioUrl()}/productos/${id}/`;
+    return `<tr><td style="padding:14px 0;border-top:1px solid #eadfd3"><b>${esc(en ? p.en : p.es)}</b><br><span style="font-size:13px;color:#7A6A60">${esc(p.eje[en ? 1 : 0])}</span></td><td align="right" style="padding:14px 0;border-top:1px solid #eadfd3"><a href="${esc(url)}" style="color:#826643;font-weight:700">${en ? "Open" : "Abrir"} →</a></td></tr>`;
   }).join("");
 
   const nombre = esc((pedido.nombre || "").split(" ")[0]);
   const cuerpo = en
     ? `<p style="font-family:Georgia,serif;font-size:26px;margin:0 0 12px">Thank you, ${nombre}.</p>
-       <p>Your payment was confirmed. Here is everything you bought. Save this email: these links are your access.</p>
+       <p>Your payment was confirmed and your Slumen account is ready. Everything you bought lives there, together with your purchase history.</p>
+       <p style="margin:22px 0">${boton(enlaceEntrar, "Enter my account →")}</p>
+       <p style="font-size:14px;color:#7A6A60">This button signs you in without a password and works for 3 days. After that, sign in any time with your email at ${esc(sitioUrl())}/cuenta.html</p>
        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${filas}</table>
        <p style="margin-top:24px">Go slowly, at your own pace. I’m walking with you.<br>— Aleja</p>
        <p style="font-size:13px;color:#7A6A60">Order ${esc(pedido.ref)}</p>`
     : `<p style="font-family:Georgia,serif;font-size:26px;margin:0 0 12px">Gracias, ${nombre}.</p>
-       <p>Tu pago quedó confirmado. Aquí tienes todo lo que elegiste. Guarda este correo: estos enlaces son tu acceso.</p>
+       <p>Tu pago quedó confirmado y tu cuenta de Slumen ya está lista. Ahí encuentras todo lo que elegiste y el historial de tus compras.</p>
+       <p style="margin:22px 0">${boton(enlaceEntrar, "Entrar a mi cuenta →")}</p>
+       <p style="font-size:14px;color:#7A6A60">Este botón te deja entrar sin contraseña y sirve por 3 días. Después, entra cuando quieras con tu correo en ${esc(sitioUrl())}/cuenta.html</p>
        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${filas}</table>
        <p style="margin-top:24px">Ve despacio, a tu ritmo. Aquí camino contigo.<br>— Aleja</p>
        <p style="font-size:13px;color:#7A6A60">Pedido ${esc(pedido.ref)}</p>`;
 
-  await enviar({
-    para: pedido.email,
-    asunto: en ? "Your Slumen access" : "Tu acceso a Slumen",
-    html: marco(cuerpo),
-    responderA: env("EMAIL_AVISO")
-  });
-  if (faltan) console.warn(`[correo] Pedido ${pedido.ref}: ${faltan} producto(s) sin enlace de acceso configurado.`);
+  await enviar({ para: pedido.email, asunto: en ? "Your Slumen access" : "Tu acceso a Slumen", html: marco(cuerpo), responderA: env("EMAIL_AVISO") });
+}
+
+// Correo para iniciar sesión (enlace mágico, sin contraseña).
+export async function enviarEnlace(email, enlace, idioma = "es") {
+  const en = idioma === "en";
+  const cuerpo = en
+    ? `<p style="font-family:Georgia,serif;font-size:26px;margin:0 0 12px">Your way back in.</p>
+       <p>Tap the button to enter your Slumen account. It works once and expires in 30 minutes.</p>
+       <p style="margin:22px 0">${boton(enlace, "Enter Slumen →")}</p>
+       <p style="font-size:14px;color:#7A6A60">If you didn’t ask for this, you can ignore this email.</p>`
+    : `<p style="font-family:Georgia,serif;font-size:26px;margin:0 0 12px">Tu camino de regreso.</p>
+       <p>Toca el botón para entrar a tu cuenta de Slumen. Sirve una sola vez y vence en 30 minutos.</p>
+       <p style="margin:22px 0">${boton(enlace, "Entrar a Slumen →")}</p>
+       <p style="font-size:14px;color:#7A6A60">Si no lo pediste, puedes ignorar este correo.</p>`;
+  await enviar({ para: email, asunto: en ? "Enter Slumen" : "Entra a Slumen", html: marco(cuerpo) });
 }
 
 export async function avisarVenta(pedido, nota = "") {

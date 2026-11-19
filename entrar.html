@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · Slumen</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/pago.css">
+</head>
+<body>
+<header class="cabecera"><div class="envoltura"><a href="index.html" aria-label="Slumen, inicio"><img src="img/nombre.png" alt="Slumen" width="372" height="92"></a></div></header>
+<main class="gracias" id="gracias" data-estado="listo">
+  <div class="envoltura" style="display:grid;place-items:center">
+    <div class="tarjeta" role="status" aria-live="polite">
+      <div class="sol" aria-hidden="true"></div>
+      <span class="etiqueta" id="etiqueta">Estás a un paso</span>
+      <h1 id="titulo">Qué bueno verte de nuevo.</h1>
+      <p id="texto">Toca el botón para entrar a tu cuenta de Slumen.</p>
+      <div class="acciones" id="acciones"><button class="boton boton--lleno" id="entrar" type="button">Entrar a mi cuenta →</button></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var en = false;
+  try { en = localStorage.getItem("slumen-lang") === "en" || (!localStorage.getItem("slumen-lang") && /^en/i.test(navigator.language)); } catch (e) {}
+  var q = new URLSearchParams(location.search);
+  var token = q.get("t") || "";
+  var volver = q.get("volver") || "/cuenta.html";
+  if (!/^\/(?!\/)/.test(volver)) volver = "/cuenta.html";
+  var $ = function (id) { return document.getElementById(id); };
+  if (en) {
+    document.documentElement.lang = "en";
+    $("etiqueta").textContent = "One step away"; $("titulo").textContent = "Good to see you again.";
+    $("texto").textContent = "Tap the button to enter your Slumen account."; $("entrar").textContent = "Enter my account →";
+  }
+  function fallo() {
+    $("gracias").dataset.estado = "rechazado";
+    $("etiqueta").textContent = en ? "Link expired" : "Enlace vencido";
+    $("titulo").textContent = en ? "This link no longer works." : "Este enlace ya no sirve.";
+    $("texto").textContent = en ? "Links work once and expire. Ask for a new one with your email." : "Los enlaces sirven una sola vez y vencen. Pide uno nuevo con tu correo.";
+    $("acciones").innerHTML = '<a class="boton boton--lleno" href="cuenta.html">' + (en ? "Get a new link →" : "Pedir un enlace nuevo →") + "</a>";
+  }
+  if (!token) { fallo(); return; }
+  $("entrar").addEventListener("click", function () {
+    $("entrar").disabled = true;
+    $("gracias").dataset.estado = "verificando";
+    fetch("/api/auth/verificar", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ t: token }) })
+      .then(function (r) { if (!r.ok) throw 0; history.replaceState(null, "", "entrar.html"); location.href = volver; })
+      .catch(fallo);
+  });
+})();
+</script>
+</body>
+</html>
