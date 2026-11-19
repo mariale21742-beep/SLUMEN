@@ -34,6 +34,9 @@ export async function enviarAcceso(pedido, enlaceEntrar) {
     const p = PRODUCTOS[id];
     const url = `${sitioUrl()}/productos/${id}/`;
     return `<tr><td style="padding:14px 0;border-top:1px solid #eadfd3"><b>${esc(en ? p.en : p.es)}</b><br><span style="font-size:13px;color:#7A6A60">${esc(p.eje[en ? 1 : 0])}</span></td><td align="right" style="padding:14px 0;border-top:1px solid #eadfd3"><a href="${esc(url)}" style="color:#826643;font-weight:700">${en ? "Open" : "Abrir"} →</a></td></tr>`;
+  }).join("") + pedido.items.filter(id => PRODUCTOS[id] && PRODUCTOS[id].evento).map(id => {
+    const p = PRODUCTOS[id];
+    return `<tr><td colspan="2" style="padding:16px;border-radius:16px;background:#E3FFFB"><span style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#826643">${en ? "Your spot is booked" : "Tu cupo está reservado"}</span><br><b style="font-size:18px">${esc(en ? p.en : p.es)}</b><br><span style="font-size:15px">${esc(p.evento[en ? "en" : "es"])}</span></td></tr>`;
   }).join("");
 
   const nombre = esc((pedido.nombre || "").split(" ")[0]);

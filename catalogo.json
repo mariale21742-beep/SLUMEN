@@ -6,7 +6,8 @@
     "recetario":  { "es": "Recetario Slumen 30 días", "en": "Slumen 30-Day Recipe Book", "eje": ["Cuerpo", "Body"], "cop": 39900, "copAntes": 54900, "usd": 12.99, "usdAntes": 17.99 },
     "mensajes":   { "es": "Mensajes de Dios · cartas digitales", "en": "Messages from God · digital cards", "eje": ["Espíritu", "Spirit"], "cop": 37900, "copAntes": 59900, "usd": 11.99, "usdAntes": 18.99 },
     "diario":     { "es": "Diario de Gratitud", "en": "Gratitude Journal", "eje": ["Espíritu", "Spirit"], "cop": 49900, "copAntes": 79900, "usd": 15.99, "usdAntes": 24.99 },
-    "pack":       { "es": "Pack Vuelve a ti", "en": "Return to Yourself Pack", "eje": ["Los tres ejes", "All three paths"], "cop": 249900, "copAntes": 314900, "usd": 79.99, "usdAntes": 99.99, "incluye": ["metodo", "movimiento", "recetario", "mensajes", "diario"] }
+    "pack":       { "es": "Pack Vuelve a ti", "en": "Return to Yourself Pack", "eje": ["Los tres ejes", "All three paths"], "cop": 249900, "copAntes": 314900, "usd": 79.99, "usdAntes": 99.99, "incluye": ["metodo", "movimiento", "recetario", "mensajes", "diario"] },
+    "habitarme":  { "es": "HABITARME · Lanzamiento de Slumen", "en": "HABITARME · Slumen launch", "eje": ["Encuentro presencial", "In-person gathering"], "cop": 170000, "usd": 42.99, "evento": { "es": "Sábado 21 de noviembre · 10:00 a. m. a 1:00 p. m. · Arkana Brunch, Envigado", "en": "Saturday, November 21 · 10:00 a.m. to 1:00 p.m. · Arkana Brunch, Envigado" } }
   },
   "pasarelas": {
     "wompi":       { "nombre": "Wompi", "moneda": "COP", "es": "Tarjeta, PSE, Nequi o Bancolombia", "en": "Card, PSE, Nequi or Bancolombia" },

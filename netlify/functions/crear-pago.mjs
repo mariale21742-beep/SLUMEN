@@ -3,7 +3,7 @@
 // Calcula el total con catalogo.json, guarda el pedido en PostgreSQL y devuelve la URL de pago.
 // Si hay sesión, el pedido queda en la cuenta de esa persona (con su correo).
 import { TODAS } from "../lib/pasarelas.mjs";
-import { PASARELAS, armarPedido } from "../lib/catalogo.mjs";
+import { PASARELAS, PRODUCTOS, armarPedido } from "../lib/catalogo.mjs";
 import { guardarPedido } from "../lib/pedidos.mjs";
 import { conDb } from "../lib/db.mjs";
 import { usuarioActual } from "../lib/sesion.mjs";
@@ -40,6 +40,7 @@ export default async req => {
 
   const base = armarPedido(datos.items, PASARELAS[pasarela].moneda, idioma);
   if (!base.items.length) return json({ error: t("Tu carrito está vacío.", "Your cart is empty.") }, 400);
+  if (base.items.some(id => PRODUCTOS[id].evento) && celular.replace(/\D/g, "").length < 7) return json({ error: t("Para el encuentro necesitamos tu celular.", "We need your phone number for the gathering.") }, 400);
 
   const pedido = { ref: nuevaReferencia(), pasarela, ...base, nombre, email, celular, idioma, usuarioId, aceptaNovedades: !!datos.novedades };
   try {

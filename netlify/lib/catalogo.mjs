@@ -36,7 +36,8 @@ export function productosAEntregar(items) {
   const lista = [];
   for (const id of items) {
     const p = PRODUCTOS[id];
-    if (p && p.incluye) lista.push(...p.incluye); else lista.push(id);
+    if (!p || p.evento) continue; // los encuentros presenciales no son productos digitales
+    if (p.incluye) lista.push(...p.incluye); else lista.push(id);
   }
   return [...new Set(lista)];
 }

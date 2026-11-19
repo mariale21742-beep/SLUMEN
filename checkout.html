@@ -98,7 +98,7 @@
       resumen: "Tu pedido", total: "Total", pagar: "Pagar", quitar: "Quitar", abriendo: "Abriendo el pago…",
       nota1: "Productos digitales: apenas se confirme el pago se crea tu cuenta y te llega el acceso al correo.",
       yaTienes: "¿Ya compraste antes?", entraCuenta: "Entra a tu cuenta", acepto: "Acepto la", politica: "política de tratamiento de datos",
-      novedades: "Quiero recibir novedades y descuentos (opcional).", errAcepta: "Acepta la política de datos para continuar.", conCuenta: "Comprando con tu cuenta:",
+      novedades: "Quiero recibir novedades y descuentos (opcional).", errAcepta: "Acepta la política de datos para continuar.", conCuenta: "Comprando con tu cuenta:", errCelular: "Para el encuentro necesitamos tu celular.",
       nota2: "Pagas en la página segura de la pasarela que elijas. Slumen no guarda los datos de tu tarjeta.",
       errNombre: "Escribe tu nombre.", errEmail: "Revisa tu correo: así te enviamos el acceso.", errMedio: "Elige un medio de pago.",
       errPreview: "En la vista previa no se puede pagar todavía.", errRed: "No pudimos abrir el pago. Intenta de nuevo en un momento.",
@@ -113,7 +113,7 @@
       resumen: "Your order", total: "Total", pagar: "Pay", quitar: "Remove", abriendo: "Opening payment…",
       nota1: "Digital products: as soon as the payment is confirmed your account is created and your access arrives by email.",
       yaTienes: "Bought before?", entraCuenta: "Sign in to your account", acepto: "I accept the", politica: "data processing policy",
-      novedades: "I want to receive news and discounts (optional).", errAcepta: "Please accept the data policy to continue.", conCuenta: "Buying with your account:",
+      novedades: "I want to receive news and discounts (optional).", errAcepta: "Please accept the data policy to continue.", conCuenta: "Buying with your account:", errCelular: "We need your phone number for the gathering.",
       nota2: "You pay on the secure page of the gateway you choose. Slumen never stores your card details.",
       errNombre: "Please write your name.", errEmail: "Check your email: that’s where we send your access.", errMedio: "Choose a payment method.",
       errPreview: "Payments aren’t available in the preview yet.", errRed: "We couldn’t open the payment. Please try again in a moment.",
@@ -179,8 +179,8 @@
       var li = document.createElement("li");
       li.innerHTML = '<span><span class="nombre"></span><br><span class="eje"></span></span><span class="valor"><s></s><span class="ahora"></span></span><button type="button" class="quitar"></button>';
       li.querySelector(".nombre").textContent = l.nombre;
-      li.querySelector(".eje").textContent = l.incluye ? t("incluyeN") : l.eje;
-      li.querySelector("s").textContent = C.precio(l.antes, m);
+      li.querySelector(".eje").textContent = l.incluye ? t("incluyeN") : (l.evento || l.eje);
+      if (l.antes && l.antes > l.valor) li.querySelector("s").textContent = C.precio(l.antes, m); else li.querySelector("s").remove();
       li.querySelector(".ahora").textContent = C.precio(l.valor, m);
       var q = li.querySelector(".quitar");
       q.textContent = t("quitar");
@@ -207,6 +207,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return error(t("errEmail"), "email");
     if (!elegida) return error(t("errMedio"));
     if (!$("acepta").checked) return error(t("errAcepta"));
+    if (C.leer().indexOf("habitarme") >= 0 && celular.replace(/\D/g, "").length < 7) return error(t("errCelular"), "celular");
     if (activas === null) return error(t("errPreview"));
     error("");
     enviando = true; $("pagar").disabled = true; pintar();

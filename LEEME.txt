@@ -124,6 +124,11 @@ Precios
 - Mensajes de Dios (cartas) ......... $59.900 -> $37.900 COP · US$18.99 -> US$11.99
 - Diario de Gratitud ................ $79.900 -> $49.900 COP · US$24.99 -> US$15.99
 - Pack Vuelve a ti .................. $314.900 -> $249.900 COP · US$99.99 -> US$79.99
+- HABITARME (encuentro 21 nov) ...... $170.000 COP · US$42.99
+  Los encuentros llevan "evento" en catalogo.json: no dan acceso a un producto digital,
+  piden celular en el checkout y el correo de compra dice "Tu cupo está reservado" con fecha y lugar.
+  Para un nuevo encuentro: copia la entrada "habitarme" en catalogo.json con otro id y pon ese id en
+  el botón del evento en index.html (data-enlace) y en la lista MAPA del carrito.
 
 Otros enlaces (index.html, bloque  const ENLACES = { )
 - inscripcion (Google Forms), guiaGratis, eventos, acompanamiento, instagram,

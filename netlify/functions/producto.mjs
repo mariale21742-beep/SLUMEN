@@ -36,7 +36,7 @@ export default async req => {
   const url = new URL(req.url);
   const partes = url.pathname.split("/").filter(Boolean); // ["productos", id, ...archivo]
   const id = partes[1];
-  if (!id || !PRODUCTOS[id] || PRODUCTOS[id].incluye) return new Response("No encontrado", { status: 404 });
+  if (!id || !PRODUCTOS[id] || PRODUCTOS[id].incluye || PRODUCTOS[id].evento) return new Response("No encontrado", { status: 404 });
   if (partes.length === 2 && !url.pathname.endsWith("/")) return redirigir(`/productos/${id}/`);
 
   const relativo = partes.slice(2).join("/") || "index.html";

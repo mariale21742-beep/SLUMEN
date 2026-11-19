@@ -711,7 +711,7 @@ body.carrito-abierto { overflow: hidden; }
           </div>
           <p>Una mañana para volver a ti: recepción con coctel, mente, cuerpo, brunch saludable y meditación profunda. Nos acompañan Alma Vela Studio y Ritmo Lunar.</p>
           <p class="evento-precio">Inversión: $170.000 COP · Cupos limitados</p>
-          <a class="boton boton--lleno boton--chico" href="#" data-enlace="eventos">Reserva tu cupo <span class="flecha" aria-hidden="true">→</span></a>
+          <a class="boton boton--lleno boton--chico" href="#" data-enlace="habitarme">Reserva tu cupo <span class="flecha" aria-hidden="true">→</span></a>
         </article>
         <article class="encuentro">
           <h3>Acompañamiento 1 a 1</h3>
@@ -1124,7 +1124,7 @@ function mostrarAviso(texto) {
 }
 
 document.querySelectorAll("[data-enlace]").forEach(a => {
-  if (["metodoMente", "movimiento", "recetario", "mensajes", "diario", "pack"].includes(a.dataset.enlace)) return; // van al carrito
+  if (["metodoMente", "movimiento", "recetario", "mensajes", "diario", "pack", "habitarme"].includes(a.dataset.enlace)) return; // van al carrito
   const datos = ENLACES[a.dataset.enlace];
   if (datos && datos.url) {
     a.href = datos.url;
@@ -1637,7 +1637,7 @@ else start();
 (function () {
   var C = window.SlumenCarrito;
   if (!C) return;
-  var MAPA = { metodoMente: "metodo", movimiento: "movimiento", recetario: "recetario", mensajes: "mensajes", diario: "diario", pack: "pack" };
+  var MAPA = { metodoMente: "metodo", movimiento: "movimiento", recetario: "recetario", mensajes: "mensajes", diario: "diario", pack: "pack", habitarme: "habitarme" };
   var $ = function (id) { return document.getElementById(id); };
   var panel = $("carrito"), flotante = $("carritoBoton");
   var origen = null;
@@ -1671,8 +1671,8 @@ else start();
       var li = document.createElement("li");
       li.innerHTML = '<span><span class="n"></span><br><span class="e"></span></span><span class="v"><s></s><span></span></span><button type="button" class="q"></button>';
       li.querySelector(".n").textContent = l.nombre;
-      li.querySelector(".e").textContent = l.incluye ? t("Incluye los 5 productos", "Includes all 5 products") : l.eje;
-      li.querySelector("s").textContent = C.precio(l.antes, moneda);
+      li.querySelector(".e").textContent = l.incluye ? t("Incluye los 5 productos", "Includes all 5 products") : (l.evento || l.eje);
+      if (l.antes && l.antes > l.valor) li.querySelector("s").textContent = C.precio(l.antes, moneda); else li.querySelector("s").remove();
       li.querySelector(".v span").textContent = C.precio(l.valor, moneda);
       var q = li.querySelector(".q");
       q.textContent = t("Quitar", "Remove");

@@ -49,7 +49,7 @@
     if (!catalogo) return [];
     return leer().filter(function (id) { return catalogo.productos[id]; }).map(function (id) {
       var p = catalogo.productos[id];
-      return { id: id, nombre: lang === "en" ? p.en : p.es, eje: p.eje[lang === "en" ? 1 : 0], valor: valor(p, moneda), antes: moneda === "USD" ? Math.round(p.usdAntes * 100) : p.copAntes, incluye: p.incluye };
+      return { id: id, nombre: lang === "en" ? p.en : p.es, eje: p.eje[lang === "en" ? 1 : 0], valor: valor(p, moneda), antes: (moneda === "USD" ? (p.usdAntes ? Math.round(p.usdAntes * 100) : null) : (p.copAntes || null)), incluye: p.incluye, evento: p.evento ? p.evento[lang === "en" ? "en" : "es"] : null };
     });
   }
 
