@@ -4,7 +4,7 @@ import { TODAS } from "../lib/pasarelas.mjs";
 import { confirmarPago } from "../lib/pedidos.mjs";
 import { json } from "../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   const q = new URL(req.url).searchParams;
   const pasarela = q.get("pasarela") || "";
   const id = (q.get("id") || "").slice(0, 200);
@@ -20,4 +20,6 @@ export default async req => {
   }
 };
 
-export const config = { path: "/api/confirmar" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/confirmar).
+export const GET = manejar;
+export const POST = manejar;

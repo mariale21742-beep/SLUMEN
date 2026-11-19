@@ -71,17 +71,16 @@
     <section id="vistaEntrar" class="entrada" hidden>
       <form id="formEntrar" class="tarjeta" novalidate>
         <span class="etiqueta" data-t="miCuenta">Mi cuenta</span>
-        <h1 data-t="entrarTitulo">Vuelve a tu espacio.</h1>
-        <p data-t="entrarTexto">Escribe el correo con el que compraste. Te enviamos un enlace para entrar, sin contraseñas.</p>
+        <h1 data-t="entrarTitulo">Entra o crea tu cuenta.</h1>
+        <p data-t="entrarTexto">Escribe tu correo y te enviamos un enlace para entrar, sin contraseñas. Si es tu primera vez, tu cuenta se crea sola. Si ya compraste, usa el mismo correo de la compra.</p>
         <p class="aviso-suave" id="sinAcceso" hidden></p>
         <div class="campo">
           <label for="correo" data-t="correo">Correo</label>
           <input id="correo" type="email" autocomplete="email" required maxlength="120">
         </div>
         <label class="consent"><input type="checkbox" id="acepta"> <span><span data-t="acepto">Acepto la</span> <a href="politica-de-datos.html" target="_blank" data-t="politica">política de tratamiento de datos</a>.</span></label>
-        <button class="boton boton--lleno pagar" type="submit" id="botonEntrar"><span data-t="enviarEnlace">Enviarme el enlace</span> <span aria-hidden="true">→</span></button>
+        <button class="boton boton--lleno pagar" type="submit" id="botonEntrar"><span data-t="enviarEnlace">Entrar con mi correo</span> <span aria-hidden="true">→</span></button>
         <p class="error" id="errorEntrar" role="alert"></p>
-        <p class="aviso-preview" id="avisoPreview" hidden data-t="preview">Vista previa: las cuentas se activan cuando la página esté publicada en Netlify con la base de datos conectada.</p>
       </form>
     </section>
 
@@ -140,10 +139,9 @@
 (function () {
   var T = {
     es: {
-      tienda: "Ver productos", cargando: "Cargando tu espacio…", miCuenta: "Mi cuenta", entrarTitulo: "Vuelve a tu espacio.",
-      entrarTexto: "Escribe el correo con el que compraste. Te enviamos un enlace para entrar, sin contraseñas.",
-      correo: "Correo", acepto: "Acepto la", politica: "política de tratamiento de datos", enviarEnlace: "Enviarme el enlace",
-      preview: "Vista previa: las cuentas se activan cuando la página esté publicada en Netlify con la base de datos conectada.",
+      tienda: "Ver productos", cargando: "Cargando tu espacio…", miCuenta: "Mi cuenta", entrarTitulo: "Entra o crea tu cuenta.",
+      entrarTexto: "Escribe tu correo y te enviamos un enlace para entrar, sin contraseñas. Si es tu primera vez, tu cuenta se crea sola. Si ya compraste, usa el mismo correo de la compra.",
+      correo: "Correo", acepto: "Acepto la", politica: "política de tratamiento de datos", enviarEnlace: "Entrar con mi correo",
       revisa: "Revisa tu correo", enviadoTitulo: "Te enviamos un enlace.", enviadoTexto: "Abre el correo que llegó a",
       enviadoTexto2: "y toca «Entrar a Slumen». Vence en 30 minutos.", spam: "¿No llega? Revisa spam o promociones.", otroCorreo: "Usar otro correo",
       salir: "Cerrar sesión", tabProductos: "Mis productos", tabCompras: "Mis compras", tabPerfil: "Mi perfil",
@@ -156,10 +154,9 @@
       estados: { entregado: "Pagado", aprobado: "Pagado", entregando: "Pagado", pendiente: "En proceso", creado: "Sin pagar", rechazado: "No se completó", revisar: "En revisión", error_entrega: "En revisión" }
     },
     en: {
-      tienda: "See products", cargando: "Loading your space…", miCuenta: "My account", entrarTitulo: "Come back to your space.",
-      entrarTexto: "Write the email you used to buy. We’ll send you a link to sign in, no passwords.",
-      correo: "Email", acepto: "I accept the", politica: "data processing policy", enviarEnlace: "Send me the link",
-      preview: "Preview: accounts turn on once the page is live on Netlify with the database connected.",
+      tienda: "See products", cargando: "Loading your space…", miCuenta: "My account", entrarTitulo: "Sign in or create your account.",
+      entrarTexto: "Write your email and we’ll send you a link to sign in, no passwords. If it’s your first time, your account is created automatically. If you already bought, use the same email.",
+      correo: "Email", acepto: "I accept the", politica: "data processing policy", enviarEnlace: "Continue with my email",
       revisa: "Check your email", enviadoTitulo: "We sent you a link.", enviadoTexto: "Open the email we sent to",
       enviadoTexto2: "and tap “Enter Slumen”. It expires in 30 minutes.", spam: "Not there? Check spam or promotions.", otroCorreo: "Use another email",
       salir: "Sign out", tabProductos: "My products", tabCompras: "My purchases", tabPerfil: "My profile",
@@ -282,7 +279,7 @@
     if (r.status === 401) { mostrar("vistaEntrar"); return; }
     if (!r.ok) throw new Error("sin servidor");
     return r.json().then(function (d) { datos = d; pintarCuenta(); mostrar("vistaCuenta"); });
-  }).catch(function () { $("avisoPreview").hidden = false; mostrar("vistaEntrar"); });
+  }).catch(function () { mostrar("vistaEntrar"); });
 })();
 </script>
 </body>

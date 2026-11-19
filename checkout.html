@@ -65,7 +65,6 @@
         <fieldset class="medios" id="medios">
           <legend class="etiqueta" data-t="medioLeyenda">Medio de pago</legend>
         </fieldset>
-        <p class="aviso-preview" id="avisoPreview" hidden data-t="preview">Vista previa: los pagos se activan cuando la página esté publicada en Netlify con las llaves de cada pasarela.</p>
       </div>
 
       <aside class="tarjeta resumen" aria-labelledby="resumenTitulo">
@@ -94,7 +93,6 @@
       vacioEtiqueta: "Tu carrito", vacioTitulo: "Todavía no has elegido nada.", vacioTexto: "Mira los tres ejes y agrega lo que hoy te llame.", verEjes: "Ver los productos",
       datos: "Tus datos", nombre: "Nombre completo", email: "Correo", emailAyuda: "Aquí te llega el acceso a tus productos.", celular: "Celular", opcional: "(opcional)",
       medio: "Cómo quieres pagar", medioLeyenda: "Medio de pago",
-      preview: "Vista previa: los pagos se activan cuando la página esté publicada en Netlify con las llaves de cada pasarela.",
       resumen: "Tu pedido", total: "Total", pagar: "Pagar", quitar: "Quitar", abriendo: "Abriendo el pago…",
       nota1: "Productos digitales: apenas se confirme el pago se crea tu cuenta y te llega el acceso al correo.",
       yaTienes: "¿Ya compraste antes?", entraCuenta: "Entra a tu cuenta", acepto: "Acepto la", politica: "política de tratamiento de datos",
@@ -109,7 +107,6 @@
       vacioEtiqueta: "Your cart", vacioTitulo: "You haven’t chosen anything yet.", vacioTexto: "Look through the three paths and add what calls you today.", verEjes: "See the products",
       datos: "Your details", nombre: "Full name", email: "Email", emailAyuda: "Your access will arrive here.", celular: "Phone", opcional: "(optional)",
       medio: "How you want to pay", medioLeyenda: "Payment method",
-      preview: "Preview: payments turn on once the page is live on Netlify with each gateway’s keys.",
       resumen: "Your order", total: "Total", pagar: "Pay", quitar: "Remove", abriendo: "Opening payment…",
       nota1: "Digital products: as soon as the payment is confirmed your account is created and your access arrives by email.",
       yaTienes: "Bought before?", entraCuenta: "Sign in to your account", acepto: "I accept the", politica: "data processing policy",
@@ -142,7 +139,8 @@
     var cat = C.catalogo; if (!cat) return;
     var caja = $("medios");
     caja.querySelectorAll(".medio").forEach(function (n) { n.remove(); });
-    var ids = Object.keys(cat.pasarelas).filter(function (k) { return !activas || activas.indexOf(k) >= 0; });
+    // Solo las pasarelas marcadas "activa" en catalogo.json (por ahora, Wompi).
+    var ids = Object.keys(cat.pasarelas).filter(function (k) { return cat.pasarelas[k].activa; });
     if (!elegida || ids.indexOf(elegida) < 0) {
       var preferida = lang === "en" ? ["paypal", "stripe", "wompi", "mercadopago"] : ["wompi", "mercadopago", "paypal", "stripe"];
       elegida = preferida.filter(function (k) { return ids.indexOf(k) >= 0; })[0] || null;
@@ -161,7 +159,6 @@
       label.querySelector(".moneda").title = p.moneda === "USD" ? t("dolares") : t("pesos");
       caja.appendChild(label);
     });
-    $("avisoPreview").hidden = activas !== null;
   }
 
   function moneda() { return elegida && C.catalogo ? C.catalogo.pasarelas[elegida].moneda : (lang === "en" ? "USD" : "COP"); }
@@ -208,7 +205,6 @@
     if (!elegida) return error(t("errMedio"));
     if (!$("acepta").checked) return error(t("errAcepta"));
     if (C.leer().indexOf("habitarme") >= 0 && celular.replace(/\D/g, "").length < 7) return error(t("errCelular"), "celular");
-    if (activas === null) return error(t("errPreview"));
     error("");
     enviando = true; $("pagar").disabled = true; pintar();
     fetch("/api/crear-pago", {

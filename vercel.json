@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/productos/:ruta*", "destination": "/api/producto?ruta=:ruta*" }
+  ],
+  "redirects": [
+    { "source": "/privado/:x*", "destination": "/404.html", "permanent": false },
+    { "source": "/lib/:x*", "destination": "/404.html", "permanent": false },
+    { "source": "/scripts/:x*", "destination": "/404.html", "permanent": false }
+  ],
+  "headers": [
+    { "source": "/catalogo.json", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+    ] }
+  ],
+  "functions": {
+    "api/**/*.js": { "maxDuration": 20, "includeFiles": "catalogo.json" }
+  }
+}

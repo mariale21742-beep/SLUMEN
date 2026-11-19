@@ -66,3 +66,14 @@ CREATE TABLE IF NOT EXISTS accesos (
   ultimo_uso  TIMESTAMPTZ,
   PRIMARY KEY (usuario_id, producto)
 );
+
+-- Archivos de los productos pagados (HTML e imágenes). Se cargan con scripts/subir-productos.mjs
+-- para que los productos no tengan que estar en el repositorio público.
+CREATE TABLE IF NOT EXISTS archivos_producto (
+  producto    TEXT NOT NULL,
+  ruta        TEXT NOT NULL,
+  tipo        TEXT NOT NULL,
+  contenido   BYTEA NOT NULL,
+  actualizado TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (producto, ruta)
+);

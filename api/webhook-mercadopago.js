@@ -5,7 +5,7 @@ import { mercadopago } from "../lib/pasarelas.mjs";
 import { confirmarPago } from "../lib/pedidos.mjs";
 import { env, hmacSha256, iguales, json } from "../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   const url = new URL(req.url);
   let cuerpo = {};
   try { cuerpo = await req.json(); } catch {}
@@ -28,4 +28,6 @@ export default async req => {
   return json({ ok: true });
 };
 
-export const config = { path: "/api/webhook-mercadopago" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/webhook-mercadopago).
+export const GET = manejar;
+export const POST = manejar;

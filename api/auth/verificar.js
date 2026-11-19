@@ -1,10 +1,10 @@
 // POST /api/auth/verificar  { t }  -> abre la sesión (cookie) si el enlace es válido y no se ha usado.
 // Es POST (no GET) para que los antivirus de correo que abren enlaces no gasten el acceso.
-import { conDb } from "../lib/db.mjs";
-import { crearSesion, usuarioPorCorreo } from "../lib/sesion.mjs";
-import { json, sha256 } from "../lib/util.mjs";
+import { conDb } from "../../lib/db.mjs";
+import { crearSesion, usuarioPorCorreo } from "../../lib/sesion.mjs";
+import { json, sha256 } from "../../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   if (req.method !== "POST") return json({ error: "Método no permitido" }, 405);
   let d = {};
   try { d = await req.json(); } catch {}
@@ -28,4 +28,6 @@ export default async req => {
   }
 };
 
-export const config = { path: "/api/auth/verificar" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/auth/verificar).
+export const GET = manejar;
+export const POST = manejar;

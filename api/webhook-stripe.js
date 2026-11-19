@@ -4,7 +4,7 @@ import { stripe } from "../lib/pasarelas.mjs";
 import { confirmarPago } from "../lib/pedidos.mjs";
 import { env, hmacSha256, iguales, json } from "../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   const crudo = await req.text();
   const cabecera = req.headers.get("stripe-signature") || "";
   const t = (cabecera.match(/(?:^|,)t=(\d+)/) || [])[1];
@@ -27,4 +27,6 @@ export default async req => {
   return json({ ok: true });
 };
 
-export const config = { path: "/api/webhook-stripe" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/webhook-stripe).
+export const GET = manejar;
+export const POST = manejar;

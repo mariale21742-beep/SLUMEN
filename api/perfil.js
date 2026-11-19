@@ -5,7 +5,7 @@ import { json } from "../lib/util.mjs";
 
 const texto = (v, n) => { const s = String(v == null ? "" : v).trim().slice(0, n); return s || null; };
 
-export default async req => {
+const manejar = async req => {
   if (req.method !== "POST") return json({ error: "Método no permitido" }, 405);
   const sql = await conDb();
   const u = await usuarioActual(req, sql);
@@ -23,4 +23,6 @@ export default async req => {
   return json({ usuario: filas[0] });
 };
 
-export const config = { path: "/api/perfil" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/perfil).
+export const GET = manejar;
+export const POST = manejar;

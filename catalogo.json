@@ -10,9 +10,9 @@
     "habitarme":  { "es": "HABITARME · Lanzamiento de Slumen", "en": "HABITARME · Slumen launch", "eje": ["Encuentro presencial", "In-person gathering"], "cop": 170000, "usd": 42.99, "evento": { "es": "Sábado 21 de noviembre · 10:00 a. m. a 1:00 p. m. · Arkana Brunch, Envigado", "en": "Saturday, November 21 · 10:00 a.m. to 1:00 p.m. · Arkana Brunch, Envigado" } }
   },
   "pasarelas": {
-    "wompi":       { "nombre": "Wompi", "moneda": "COP", "es": "Tarjeta, PSE, Nequi o Bancolombia", "en": "Card, PSE, Nequi or Bancolombia" },
-    "mercadopago": { "nombre": "Mercado Pago", "moneda": "COP", "es": "Tarjeta, PSE o saldo en Mercado Pago", "en": "Card, PSE or Mercado Pago balance" },
-    "paypal":      { "nombre": "PayPal", "moneda": "USD", "es": "Cuenta PayPal o tarjeta internacional", "en": "PayPal account or international card" },
-    "stripe":      { "nombre": "Stripe", "moneda": "USD", "es": "Tarjeta internacional, Apple Pay o Google Pay", "en": "International card, Apple Pay or Google Pay" }
+    "wompi":       { "activa": true, "nombre": "Wompi", "moneda": "COP", "es": "Tarjeta, PSE, Nequi o Bancolombia", "en": "Card, PSE, Nequi or Bancolombia" },
+    "mercadopago": { "activa": false, "nombre": "Mercado Pago", "moneda": "COP", "es": "Tarjeta, PSE o saldo en Mercado Pago", "en": "Card, PSE or Mercado Pago balance" },
+    "paypal":      { "activa": false, "nombre": "PayPal", "moneda": "USD", "es": "Cuenta PayPal o tarjeta internacional", "en": "PayPal account or international card" },
+    "stripe":      { "activa": false, "nombre": "Stripe", "moneda": "USD", "es": "Tarjeta internacional, Apple Pay o Google Pay", "en": "International card, Apple Pay or Google Pay" }
   }
 }

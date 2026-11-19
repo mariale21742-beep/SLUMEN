@@ -481,6 +481,22 @@ img { display: block; max-width: 100%; }
 body.visor-abierto { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .visor .pantalla { overflow-y: auto; } .visor .pantalla img.sube { animation: none; } }
 
+/* ---------- Botón Entrar / Mi cuenta ---------- */
+.boton-cuenta {
+  display: inline-flex; align-items: center; gap: 8px; flex: none; margin-left: 14px;
+  font: 700 14px/1 var(--f-cuerpo); color: var(--texto); text-decoration: none;
+  border: 1px solid var(--texto); border-radius: 999px; padding: 9px 14px 9px 11px; background: var(--hoja);
+  transition: background .3s, color .3s;
+}
+.boton-cuenta:hover { background: var(--texto); color: var(--marfil); }
+.boton-cuenta svg { width: 18px; height: 18px; }
+.boton-cuenta[data-conectada] { background: var(--dorado); border-color: var(--dorado); color: var(--marfil); }
+.cabecera .menu { order: 1; }
+.cabecera .boton-cuenta { order: 2; }
+.cabecera .ls-sw { order: 3; }
+.cabecera .boton-menu { order: 4; }
+@media (max-width: 420px) { .boton-cuenta span { display: none; } .boton-cuenta { padding: 9px; } }
+
 /* ---------- Carrito ---------- */
 .carrito-flotante {
   position: fixed; right: 16px; bottom: 16px; z-index: 70; display: inline-flex; align-items: center; gap: 10px;
@@ -540,6 +556,10 @@ body.carrito-abierto { overflow: hidden; }
     <a class="marca-chica" href="#inicio" data-ir="inicio" aria-label="Slumen, inicio">
       <img src="img/nombre.png" alt="Slumen" width="372" height="92">
     </a>
+    <a class="boton-cuenta" id="botonCuenta" href="cuenta.html" data-no-i18n>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="7" r="3.2"/><path d="M3.5 17c1.2-3.2 3.6-4.8 6.5-4.8s5.3 1.6 6.5 4.8"/></svg>
+      <span id="botonCuentaTexto">Entrar</span>
+    </a>
     <button class="boton-menu" id="botonMenu" aria-expanded="false" aria-controls="menu">Menú <span aria-hidden="true">+</span></button>
     <nav class="menu" id="menu" data-abierto="no" aria-label="Principal">
       <a href="#mente" data-ir="mente">Mente</a>
@@ -549,7 +569,6 @@ body.carrito-abierto { overflow: hidden; }
       <a href="#aleja" data-ir="inicio" data-ancla="aleja">Aleja</a>
       <a href="#test" data-ir="inicio" data-ancla="test">Test</a>
       <a href="#encuentros" data-ir="inicio" data-ancla="encuentros">Encuentros</a>
-      <a href="cuenta.html">Mi cuenta</a>
       <a class="boton boton--lleno boton--chico" href="#" data-enlace="inscripcion">Inscríbete</a>
     </nav>
   </div>
@@ -1082,7 +1101,7 @@ body.carrito-abierto { overflow: hidden; }
     <div class="carrito-pie">
       <div class="carrito-total"><span id="carritoTotalTxt">Total</span><b id="carritoTotal">$0</b></div>
       <a class="boton boton--lleno" href="checkout.html" id="carritoPagar">Ir a pagar <span class="flecha" aria-hidden="true">→</span></a>
-      <p class="nota-c" id="carritoNota">Pagas con Wompi, Mercado Pago, PayPal o Stripe. El acceso llega a tu correo.</p>
+      <p class="nota-c" id="carritoNota">Pagas con Wompi: tarjeta, PSE, Nequi o Bancolombia. El acceso llega a tu correo.</p>
       <button type="button" class="test-atras" data-cerrar-carrito id="carritoSeguir">Seguir mirando</button>
     </div>
   </aside>
@@ -1655,7 +1674,7 @@ else start();
     $("carritoTitulo").textContent = t("Tu carrito", "Your cart");
     $("carritoTotalTxt").textContent = "Total";
     $("carritoPagar").innerHTML = t("Ir a pagar", "Go to checkout") + ' <span class="flecha" aria-hidden="true">→</span>';
-    $("carritoNota").textContent = t("Pagas con Wompi, Mercado Pago, PayPal o Stripe. El acceso llega a tu correo.", "Pay with Wompi, Mercado Pago, PayPal or Stripe. Your access arrives by email.");
+    $("carritoNota").textContent = t("Pagas con Wompi: tarjeta, PSE, Nequi o Bancolombia. El acceso llega a tu correo.", "Pay with Wompi: card, PSE, Nequi or Bancolombia. Your access arrives by email.");
     $("carritoSeguir").textContent = t("Seguir mirando", "Keep browsing");
     panel.querySelector(".visor-cerrar").setAttribute("aria-label", t("Cerrar", "Close"));
     var ul = $("carritoLista"); ul.innerHTML = "";
@@ -1717,6 +1736,24 @@ else start();
   window.addEventListener("slumencarrito", pintar);
   window.addEventListener("slumenlang", pintar);
   if (C.leer().length) C.cargar().then(pintar);
+})();
+</script>
+
+<script>
+/* ---------- Botón Entrar / Mi cuenta en la cabecera ---------- */
+(function () {
+  var b = document.getElementById("botonCuenta"), txt = document.getElementById("botonCuentaTexto");
+  if (!b) return;
+  var conectada = false;
+  function pintar() {
+    var en = window.SLUMEN_I18N && SLUMEN_I18N.lang === "en";
+    txt.textContent = conectada ? (en ? "My account" : "Mi cuenta") : (en ? "Sign in" : "Entrar");
+    b.setAttribute("aria-label", conectada ? txt.textContent : (en ? "Sign in or create your account" : "Entrar o crear tu cuenta"));
+    if (conectada) b.setAttribute("data-conectada", ""); else b.removeAttribute("data-conectada");
+  }
+  window.addEventListener("slumenlang", pintar);
+  pintar();
+  fetch("/api/yo", { cache: "no-store" }).then(function (r) { if (r.ok) { conectada = true; pintar(); } }).catch(function () {});
 })();
 </script>
 

@@ -1,11 +1,11 @@
 // POST /api/auth/enlace  { email, volver, idioma, acepta }
 // Envía un enlace de acceso al correo. Siempre responde igual, exista o no la cuenta.
-import { conDb } from "../lib/db.mjs";
-import { crearEnlace } from "../lib/sesion.mjs";
-import { enviarEnlace } from "../lib/correo.mjs";
-import { json, sitioUrl, rutaSegura, CORREO_VALIDO } from "../lib/util.mjs";
+import { conDb } from "../../lib/db.mjs";
+import { crearEnlace } from "../../lib/sesion.mjs";
+import { enviarEnlace } from "../../lib/correo.mjs";
+import { json, sitioUrl, rutaSegura, CORREO_VALIDO } from "../../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   if (req.method !== "POST") return json({ error: "Método no permitido" }, 405);
   let d = {};
   try { d = await req.json(); } catch {}
@@ -31,4 +31,6 @@ export default async req => {
   }
 };
 
-export const config = { path: "/api/auth/enlace" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/auth/enlace).
+export const GET = manejar;
+export const POST = manejar;

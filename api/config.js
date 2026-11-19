@@ -3,9 +3,11 @@ import { TODAS } from "../lib/pasarelas.mjs";
 import { hayDb } from "../lib/db.mjs";
 import { json } from "../lib/util.mjs";
 
-export default async () => {
+const manejar = async () => {
   const activas = Object.keys(TODAS).filter(k => TODAS[k].habilitada());
   return json({ pasarelas: activas, cuentas: hayDb() });
 };
 
-export const config = { path: "/api/config" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/config).
+export const GET = manejar;
+export const POST = manejar;

@@ -6,7 +6,7 @@ import { env, sha256, iguales, json } from "../lib/util.mjs";
 
 const valor = (obj, ruta) => ruta.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
 
-export default async req => {
+const manejar = async req => {
   let evento;
   try { evento = await req.json(); } catch { return json({ ok: false }, 400); }
   const firma = evento.signature || {};
@@ -26,4 +26,6 @@ export default async req => {
   return json({ ok: true });
 };
 
-export const config = { path: "/api/webhook-wompi" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/webhook-wompi).
+export const GET = manejar;
+export const POST = manejar;

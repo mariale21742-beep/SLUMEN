@@ -1,5 +1,5 @@
 SLUMEN · Página web con carrito, pagos, cuentas y productos privados
-=======================================
+====================================================================
 
 Qué hay en esta carpeta
 - index.html ............ La página completa (inicio, test, Aleja, Mente, Cuerpo, Espíritu, historia).
@@ -11,23 +11,25 @@ Qué hay en esta carpeta
 - politica-de-datos.html  BORRADOR de la política de tratamiento de datos (Ley 1581). Completar y revisar con abogado.
 - 404.html .............. Página para rutas que no existen.
 - privado/productos/ .... LOS PRODUCTOS PAGADOS (Método, Movimiento, Recetario, Mensajes de Dios, Diario).
-                          Nadie puede abrirlos directamente: solo se sirven por /productos/<id>/ a quien los compró.
+                          NO está en GitHub (el repositorio es público). Aleja tiene esta carpeta y se sube
+                          a la base de datos con scripts/subir-productos.mjs. Solo se sirven por /productos/<id>/
+                          a quien los compró.
+- scripts/subir-productos.mjs  Sube privado/productos/ a la tabla archivos_producto de PostgreSQL.
 - sql/esquema.sql ....... Tablas de la base de datos PostgreSQL (se crean solas al primer uso).
 - catalogo.json ......... PRECIOS de cada producto en COP y USD (el servidor cobra con estos valores).
 - js/carrito.js ......... Carrito compartido por las tres páginas.
 - css/pago.css .......... Estilos de checkout y gracias.
-- netlify/functions/ .... Funciones del servidor (crear pago, confirmar, webhooks).
-- netlify/lib/ .......... Código compartido: base de datos, sesiones, pasarelas, pedidos y correo.
+- api/ .................. Funciones del servidor en Vercel (cada archivo es una ruta /api/...).
+- lib/ .................. Código compartido: base de datos, sesiones, pasarelas, pedidos y correo.
+- vercel.json ........... Reglas de Vercel: /productos/* va a la función protegida; bloquea /privado, /lib y /scripts.
 - img/ .................. Logo, foto de Aleja y capturas de cada producto (img/recorrido/).
 - Guia-Vuelve-a-ti-Slumen.pdf  Guía gratuita.
 
 Cómo funciona la compra
 1. La persona toca "Comprar" -> el producto entra al carrito (si agrega el Pack, se quitan los productos que ya incluye).
-2. "Ir a pagar" -> checkout.html. Escribe nombre y correo y elige el medio de pago:
-     Wompi ........ COP  (tarjeta, PSE, Nequi, Bancolombia)
-     Mercado Pago . COP
-     PayPal ....... USD
-     Stripe ....... USD
+2. "Ir a pagar" -> checkout.html. Escribe nombre y correo y paga con Wompi (COP: tarjeta, PSE, Nequi, Bancolombia).
+   Mercado Pago, PayPal y Stripe ya están programados pero APAGADOS: en catalogo.json, "pasarelas",
+   tienen "activa": false. Para encender uno, cambia a true y agrega sus llaves en Vercel.
 3. El servidor calcula el total con catalogo.json, guarda el pedido y la envía a la página segura de la pasarela.
 4. Al volver a gracias.html (y también por webhook), el servidor CONSULTA el pago en la pasarela.
    Si está aprobado y el monto coincide:
@@ -47,19 +49,25 @@ Cuentas y seguridad
 - Máximo 5 enlaces de acceso por correo por hora.
 - Si la persona compra con la sesión abierta, el pedido queda en su cuenta aunque escriba otro correo.
 - Checkout y Mi cuenta piden aceptar la política de datos; la fecha de aceptación queda guardada.
-Solo aparecen en el checkout las pasarelas que tengan sus llaves configuradas.
+- Registro: no hay formulario aparte. En "Entrar" (botón arriba a la derecha, o /cuenta.html) la persona escribe
+  su correo; si es nueva, la cuenta se crea sola al abrir el enlace. Al comprar, la cuenta también se crea sola.
 
 ---------------------------------------------------------------------
-PUBLICAR EN NETLIFY (necesario para que los pagos funcionen)
+PUBLICAR EN VERCEL (ya conectado: www.slumen.app)
 ---------------------------------------------------------------------
-GitHub Pages NO sirve para esto: los pagos necesitan las funciones de servidor.
-1. Crear cuenta en https://netlify.com -> "Add new site" -> "Import from Git" -> elegir el repositorio SLUMEN.
-   Build command: (vacío). Publish directory: .   Netlify instala @netlify/blobs solo (package.json).
-2. Site configuration -> Environment variables: agregar las variables de abajo.
-3. Volver a desplegar (Deploys -> Trigger deploy).
+Vercel publica solo cada cambio que llega a GitHub (rama main). Para que pagos y cuentas funcionen:
+1. Base de datos: en Vercel -> proyecto slumen -> Storage -> Create Database -> Neon (Postgres).
+   Al conectarla, Vercel crea DATABASE_URL / POSTGRES_URL sola. Las tablas se crean solas al primer uso.
+2. Settings -> Environment Variables: agregar las variables de abajo (Production).
+3. Deployments -> ... -> Redeploy, para que tome las variables.
+4. Subir los productos a la base (una vez, y cada vez que cambie un producto), desde el computador que tiene
+   la carpeta privado/productos/ y Node 22:
+     npm install
+     DATABASE_URL="(la de Vercel)" node scripts/subir-productos.mjs
+5. En Wompi, configurar la URL de eventos (abajo) y probar con llaves de prueba.
 
 Variables de entorno
-  SITIO_URL ............... https://tudominio.com (sin / al final). Si no se pone, se usa la URL de Netlify.
+  SITIO_URL ............... https://www.slumen.app (sin / al final). Se usa en los enlaces de los correos.
 
   Correo (https://resend.com, plan gratis):
   RESEND_API_KEY .......... re_...
@@ -68,8 +76,8 @@ Variables de entorno
 
   Base de datos PostgreSQL (OBLIGATORIA para pedidos, cuentas y productos):
   DATABASE_URL ............ postgres://usuario:clave@host/base?sslmode=require
-                            Opciones: Netlify DB (Extensions > Neon; crea NETLIFY_DATABASE_URL sola, también sirve),
-                            Neon (neon.tech) o Supabase (usar la cadena "connection pooling", puerto 6543).
+                            La crea Vercel al conectar Neon (también sirve POSTGRES_URL). Otra opción: Supabase
+                            (usar la cadena "connection pooling", puerto 6543).
                             Las tablas se crean solas la primera vez (ver sql/esquema.sql).
 
   Wompi (https://comercios.wompi.co -> Desarrolladores):
@@ -77,6 +85,8 @@ Variables de entorno
   WOMPI_INTEGRITY_SECRET .. "Integridad"
   WOMPI_EVENTS_SECRET ..... "Eventos"
   En el panel de Wompi, URL de eventos: https://tudominio.com/api/webhook-wompi
+
+  --- Las siguientes están APAGADAS por ahora ("activa": false en catalogo.json) ---
 
   Mercado Pago (https://www.mercadopago.com.co/developers -> Tus integraciones):
   MP_ACCESS_TOKEN ......... APP_USR-... (credenciales de producción; de prueba para probar)
@@ -101,6 +111,7 @@ Base de datos (tablas)
 - accesos ......... qué producto tiene cada cuenta, desde qué pedido, y último uso.
 - sesiones ........ sesiones abiertas (solo hash del token).
 - enlaces_acceso .. enlaces de entrada enviados por correo (solo hash, vencen solos).
+- archivos_producto  HTML e imágenes de los productos pagados (los sube scripts/subir-productos.mjs).
 Consultas útiles (en la consola SQL de Neon/Supabase):
   select ref, email, total, moneda, estado, creado from pedidos order by creado desc limit 50;
   select u.email, a.producto, a.otorgado from accesos a join usuarios u on u.id = a.usuario_id order by a.otorgado desc;
@@ -110,11 +121,11 @@ Consultas útiles (en la consola SQL de Neon/Supabase):
 - La referencia (SLM-...) aparece en el correo, en el aviso de venta, en Mis compras y en el panel de cada pasarela.
 
 Cambiar un producto
-- Reemplaza privado/productos/<id>/index.html (y sus imágenes en la misma carpeta) y vuelve a desplegar.
+- Reemplaza privado/productos/<id>/index.html (y sus imágenes en la misma carpeta) y vuelve a correr
+  scripts/subir-productos.mjs. No hace falta redesplegar.
 
 Probar antes de cobrar de verdad
-- Usar llaves de prueba (Wompi pub_test_, Mercado Pago de prueba, PayPal sandbox, Stripe sk_test_).
-- Tarjetas de prueba: Wompi 4242 4242 4242 4242; Stripe 4242 4242 4242 4242; PayPal con cuenta sandbox.
+- Usar las llaves de prueba de Wompi (pub_test_...) y la tarjeta de prueba 4242 4242 4242 4242.
 
 Precios
 - En catalogo.json (es lo que se cobra). Si cambias un precio, cámbialo también en index.html (busca class="precio").

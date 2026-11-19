@@ -4,7 +4,7 @@ import { usuarioActual } from "../lib/sesion.mjs";
 import { PRODUCTOS } from "../lib/catalogo.mjs";
 import { json } from "../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   let sql;
   try { sql = await conDb(); } catch (e) { console.error("[yo]", e.message); return json({ error: "servidor" }, 503); }
   const u = await usuarioActual(req, sql);
@@ -27,4 +27,6 @@ export default async req => {
   });
 };
 
-export const config = { path: "/api/yo" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/yo).
+export const GET = manejar;
+export const POST = manejar;

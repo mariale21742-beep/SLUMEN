@@ -1,4 +1,7 @@
 .DS_Store
 node_modules/
-.netlify/
+.vercel/
 .env
+.env.local
+# Productos pagados: NO van al repositorio público. Se suben a la base con scripts/subir-productos.mjs
+privado/

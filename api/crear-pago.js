@@ -9,7 +9,7 @@ import { conDb } from "../lib/db.mjs";
 import { usuarioActual } from "../lib/sesion.mjs";
 import { json, nuevaReferencia, CORREO_VALIDO } from "../lib/util.mjs";
 
-export default async req => {
+const manejar = async req => {
   if (req.method !== "POST") return json({ error: "Método no permitido" }, 405);
   let datos;
   try { datos = await req.json(); } catch { return json({ error: "Datos inválidos" }, 400); }
@@ -53,4 +53,6 @@ export default async req => {
   }
 };
 
-export const config = { path: "/api/crear-pago" };
+// Vercel: cada archivo de /api es una ruta (por ejemplo /api/crear-pago).
+export const GET = manejar;
+export const POST = manejar;
