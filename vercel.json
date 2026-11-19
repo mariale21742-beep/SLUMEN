@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/productos/:ruta*", "destination": "/api/producto?ruta=:ruta*" }
+    { "source": "/productos/(.*)", "destination": "/api/producto?ruta=$1" }
   ],
   "redirects": [
     { "source": "/privado/:x*", "destination": "/404.html", "permanent": false },
