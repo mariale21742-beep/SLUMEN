@@ -1,5 +1,5 @@
 {
-  "_nota": "Precios de venta. cop en pesos colombianos (sin decimales); usd en dólares. Si cambias un precio aquí, cámbialo también en index.html (class=\"precio\").",
+  "_nota": "Precios de venta. wompi.link es el link de pago de Wompi: se usa mientras el servidor no tenga las llaves de Wompi. cop en pesos colombianos (sin decimales); usd en dólares. Si cambias un precio aquí, cámbialo también en index.html (class=\"precio\").",
   "productos": {
     "metodo":     { "es": "Método Slumen Mente", "en": "Slumen Mind Method", "eje": ["Mente", "Mind"], "cop": 49900, "copAntes": 69900, "usd": 15.99, "usdAntes": 21.99 },
     "movimiento": { "es": "Movimiento y respiración consciente", "en": "Mindful Movement and Breathing", "eje": ["Cuerpo", "Body"], "cop": 49900, "copAntes": 79900, "usd": 15.99, "usdAntes": 24.99 },
@@ -10,7 +10,7 @@
     "habitarme":  { "es": "HABITARME · Lanzamiento de Slumen", "en": "HABITARME · Slumen launch", "eje": ["Encuentro presencial", "In-person gathering"], "cop": 170000, "usd": 42.99, "evento": { "es": "Sábado 21 de noviembre · 10:00 a. m. a 1:00 p. m. · Arkana Brunch, Envigado", "en": "Saturday, November 21 · 10:00 a.m. to 1:00 p.m. · Arkana Brunch, Envigado" } }
   },
   "pasarelas": {
-    "wompi":       { "activa": true, "nombre": "Wompi", "moneda": "COP", "es": "Tarjeta, PSE, Nequi o Bancolombia", "en": "Card, PSE, Nequi or Bancolombia" },
+    "wompi":       { "activa": true, "nombre": "Wompi", "link": "https://checkout.wompi.co/l/VPOS_KBdkJD", "moneda": "COP", "es": "Tarjeta, PSE, Nequi o Bancolombia", "en": "Card, PSE, Nequi or Bancolombia" },
     "mercadopago": { "activa": false, "nombre": "Mercado Pago", "moneda": "COP", "es": "Tarjeta, PSE o saldo en Mercado Pago", "en": "Card, PSE or Mercado Pago balance" },
     "paypal":      { "activa": false, "nombre": "PayPal", "moneda": "USD", "es": "Cuenta PayPal o tarjeta internacional", "en": "PayPal account or international card" },
     "stripe":      { "activa": false, "nombre": "Stripe", "moneda": "USD", "es": "Tarjeta internacional, Apple Pay o Google Pay", "en": "International card, Apple Pay or Google Pay" }

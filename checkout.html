@@ -81,6 +81,15 @@
         </div>
       </aside>
     </form>
+
+    <div id="listo" class="tarjeta vacio" hidden>
+      <span class="etiqueta" data-t="listoEtiqueta">Último paso</span>
+      <h2 data-t="listoTitulo">Termina tu pago en Wompi.</h2>
+      <p><span data-t="listoPaga">Abrimos el pago de Wompi en otra pestaña. Escribe este valor:</span> <b id="listoTotal"></b></p>
+      <p data-t="listoComprobante">Cuando termines, envíanos el comprobante por WhatsApp y te llega el acceso a tu correo.</p>
+      <a class="boton boton--lleno" id="listoWompi" href="#" target="_blank" rel="noopener"><span data-t="listoAbrir">Abrir el pago de Wompi</span> <span aria-hidden="true">→</span></a>
+      <a class="boton" id="listoWhatsapp" href="#" target="_blank" rel="noopener" style="margin-top:10px"><span data-t="listoEnviar">Enviar comprobante por WhatsApp</span> <span aria-hidden="true">→</span></a>
+    </div>
   </div>
 </main>
 
@@ -100,7 +109,9 @@
       nota2: "Pagas en la página segura de la pasarela que elijas. Slumen no guarda los datos de tu tarjeta.",
       errNombre: "Escribe tu nombre.", errEmail: "Revisa tu correo: así te enviamos el acceso.", errMedio: "Elige un medio de pago.",
       errPreview: "En la vista previa no se puede pagar todavía.", errRed: "No pudimos abrir el pago. Intenta de nuevo en un momento.",
-      incluyeN: "Incluye los 5 productos", pesos: "Pesos colombianos", dolares: "Dólares"
+      incluyeN: "Incluye los 5 productos", pesos: "Pesos colombianos", dolares: "Dólares",
+      listoEtiqueta: "Último paso", listoTitulo: "Termina tu pago en Wompi.", listoPaga: "Abrimos el pago de Wompi en otra pestaña. Escribe este valor:",
+      listoComprobante: "Cuando termines, envíanos el comprobante por WhatsApp y te llega el acceso a tu correo.", listoAbrir: "Abrir el pago de Wompi", listoEnviar: "Enviar comprobante por WhatsApp"
     },
     en: {
       seguro: "Secure payment", seguir: "Keep browsing", etiqueta: "Your purchase", titulo: "One more step to return to yourself.",
@@ -114,7 +125,9 @@
       nota2: "You pay on the secure page of the gateway you choose. Slumen never stores your card details.",
       errNombre: "Please write your name.", errEmail: "Check your email: that’s where we send your access.", errMedio: "Choose a payment method.",
       errPreview: "Payments aren’t available in the preview yet.", errRed: "We couldn’t open the payment. Please try again in a moment.",
-      incluyeN: "Includes all 5 products", pesos: "Colombian pesos", dolares: "US dollars"
+      incluyeN: "Includes all 5 products", pesos: "Colombian pesos", dolares: "US dollars",
+      listoEtiqueta: "Last step", listoTitulo: "Finish your payment on Wompi.", listoPaga: "We opened Wompi’s payment page in another tab. Enter this amount:",
+      listoComprobante: "When you’re done, send us the receipt on WhatsApp and your access will arrive by email.", listoAbrir: "Open Wompi payment", listoEnviar: "Send receipt on WhatsApp"
     }
   };
   var C = window.SlumenCarrito;
@@ -168,7 +181,7 @@
     var m = moneda();
     var lineas = C.lineas(m, lang);
     $("vacio").hidden = lineas.length > 0;
-    $("formulario").hidden = lineas.length === 0;
+    $("formulario").hidden = lineas.length === 0 || !$("listo").hidden;
     var ul = $("lineas"); ul.innerHTML = "";
     var total = 0;
     lineas.forEach(function (l) {
@@ -206,6 +219,9 @@
     if (!$("acepta").checked) return error(t("errAcepta"));
     if (C.leer().indexOf("habitarme") >= 0 && celular.replace(/\D/g, "").length < 7) return error(t("errCelular"), "celular");
     error("");
+    // Mientras el servidor no tenga las llaves de Wompi, se paga con el link de pago (catalogo.json > wompi.link).
+    var link = C.catalogo.pasarelas[elegida] && C.catalogo.pasarelas[elegida].link;
+    if (link && (!activas || activas.indexOf(elegida) < 0)) return pagarConLink(link, nombre, email, celular);
     enviando = true; $("pagar").disabled = true; pintar();
     fetch("/api/crear-pago", {
       method: "POST", headers: { "content-type": "application/json" },
@@ -221,6 +237,21 @@
         error(err && err.message ? err.message : t("errRed"));
       });
   });
+
+  function pagarConLink(link, nombre, email, celular) {
+    var m = moneda(), lineas = C.lineas(m, "es"), total = 0;
+    lineas.forEach(function (l) { total += l.valor; });
+    var valor = C.precio(total, m) + " " + m;
+    window.open(link, "_blank", "noopener");
+    var texto = "Hola Aleja, te envío el comprobante de mi pago en Wompi.\n" +
+      "Pedido: " + lineas.map(function (l) { return l.nombre; }).join(", ") + "\nTotal: " + valor +
+      "\nNombre: " + nombre + "\nCorreo: " + email + (celular ? "\nCelular: " + celular : "");
+    $("listoTotal").textContent = valor;
+    $("listoWompi").href = link;
+    $("listoWhatsapp").href = "https://wa.me/573207563404?text=" + encodeURIComponent(texto);
+    $("formulario").hidden = true; $("listo").hidden = false;
+    $("listo").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   document.querySelectorAll("[data-lang]").forEach(function (b) { b.addEventListener("click", function () { ponerIdioma(b.dataset.lang); }); });
   window.addEventListener("slumencarrito", pintar);
