@@ -5,7 +5,7 @@
 import { TODAS } from "../lib/pasarelas.mjs";
 import { PASARELAS, PRODUCTOS, armarPedido } from "../lib/catalogo.mjs";
 import { guardarPedido } from "../lib/pedidos.mjs";
-import { conDb } from "../lib/db.mjs";
+import { conDb, hayDb } from "../lib/db.mjs";
 import { usuarioActual } from "../lib/sesion.mjs";
 import { json, nuevaReferencia, CORREO_VALIDO } from "../lib/util.mjs";
 
@@ -26,8 +26,11 @@ const manejar = async req => {
   let email = String(c.email || "").trim().toLowerCase().slice(0, 120);
   const celular = String(c.celular || "").replace(/[^\d+ ]/g, "").slice(0, 20);
 
+  // Sin base de datos todavía: igual se abre el pago de Wompi con el valor exacto;
+  // el acceso se entrega a mano mientras se conecta la base.
+  const conCuentas = hayDb();
   let usuarioId = null;
-  try {
+  if (conCuentas) try {
     const sql = await conDb();
     const u = await usuarioActual(req, sql);
     if (u) { usuarioId = u.id; email = u.email; nombre = nombre || u.nombre || ""; }
@@ -44,7 +47,8 @@ const manejar = async req => {
 
   const pedido = { ref: nuevaReferencia(), pasarela, ...base, nombre, email, celular, idioma, usuarioId, aceptaNovedades: !!datos.novedades };
   try {
-    await guardarPedido(pedido);
+    if (conCuentas) await guardarPedido(pedido);
+    else console.warn("[crear-pago] sin base de datos: pedido", pedido.ref, pedido.email, pedido.items.join(","));
     const url = await motor.crear(pedido);
     return json({ url, ref: pedido.ref });
   } catch (e) {

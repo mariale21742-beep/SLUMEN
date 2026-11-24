@@ -3,6 +3,7 @@
 import { TODAS } from "../lib/pasarelas.mjs";
 import { confirmarPago } from "../lib/pedidos.mjs";
 import { json } from "../lib/util.mjs";
+import { hayDb } from "../lib/db.mjs";
 
 const manejar = async req => {
   const q = new URL(req.url).searchParams;
@@ -12,6 +13,7 @@ const manejar = async req => {
   if (!motor || !motor.habilitada() || !id) return json({ estado: "desconocido" }, 400);
   try {
     const resultado = await motor.verificar(id);
+    if (!hayDb()) return json({ estado: resultado.estado === "aprobado" ? "aprobado" : resultado.estado, ref: resultado.ref, sinCuenta: true });
     const r = await confirmarPago(pasarela, resultado, id);
     return json({ estado: r.estado, ref: r.ref, email: r.email ? r.email.replace(/^(.).*?(@.*)$/, "$1•••$2") : undefined });
   } catch (e) {

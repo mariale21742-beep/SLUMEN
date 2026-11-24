@@ -60,7 +60,11 @@
     $("etiqueta").textContent = x[0];
     $("titulo").textContent = x[1];
     var texto = x[2];
-    if (estado === "aprobado") {
+    if (estado === "aprobado" && datos && datos.sinCuenta) {
+      texto = es
+        ? "Tu pago quedó confirmado. En las próximas horas te enviamos el acceso a tus productos al correo que escribiste."
+        : "Your payment was confirmed. Within the next few hours we’ll send your access to the email you entered.";
+    } else if (estado === "aprobado") {
       texto = es
         ? "Tus productos ya están en tu cuenta. También te enviamos un correo" + (datos && datos.email ? " a " + datos.email : "") + " con un botón para entrar sin contraseña."
         : "Your products are already in your account. We also emailed you" + (datos && datos.email ? " at " + datos.email : "") + " a button to sign in without a password.";
@@ -68,7 +72,7 @@
     $("texto").textContent = texto;
     var acc = $("acciones"); acc.innerHTML = "";
     if (estado === "rechazado") acc.append(boton(es ? "Intentar de nuevo →" : "Try again →", "checkout.html", true));
-    if (estado === "aprobado") acc.append(boton(es ? "Ir a mis productos →" : "Go to my products →", "cuenta.html", true));
+    if (estado === "aprobado" && !(datos && datos.sinCuenta)) acc.append(boton(es ? "Ir a mis productos →" : "Go to my products →", "cuenta.html", true));
     if (estado !== "verificando") acc.append(boton(es ? "Volver a Slumen" : "Back to Slumen", "index.html", estado === "pendiente" || estado === "desconocido"));
     if (estado === "aprobado" || estado === "pendiente") C.vaciar();
   }
