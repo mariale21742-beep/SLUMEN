@@ -89,6 +89,7 @@
       <p data-t="listoComprobante">Cuando termines, envíanos el comprobante por WhatsApp y te llega el acceso a tu correo.</p>
       <a class="boton boton--lleno" id="listoWompi" href="#" target="_blank" rel="noopener"><span data-t="listoAbrir">Abrir el pago de Wompi</span> <span aria-hidden="true">→</span></a>
       <a class="boton" id="listoWhatsapp" href="#" target="_blank" rel="noopener" style="margin-top:10px"><span data-t="listoEnviar">Enviar comprobante por WhatsApp</span> <span aria-hidden="true">→</span></a>
+      <button type="button" class="boton boton--linea" id="listoOtra" style="margin-top:10px"><span data-t="listoOtra">Hacer otra compra</span></button>
     </div>
   </div>
 </main>
@@ -111,7 +112,9 @@
       errPreview: "En la vista previa no se puede pagar todavía.", errRed: "No pudimos abrir el pago. Intenta de nuevo en un momento.",
       incluyeN: "Incluye los 5 productos", pesos: "Pesos colombianos", dolares: "Dólares",
       listoEtiqueta: "Último paso", listoTitulo: "Termina tu pago en Wompi.", listoPaga: "Abrimos el pago de Wompi en otra pestaña. Escribe este valor:",
-      listoComprobante: "Cuando termines, envíanos el comprobante por WhatsApp y te llega el acceso a tu correo.", listoAbrir: "Abrir el pago de Wompi", listoEnviar: "Enviar comprobante por WhatsApp"
+      listoComprobante: "Cuando Wompi te muestre el pago aprobado, vuelve a esta pestaña de Slumen y envíanos el comprobante por WhatsApp. Te enviamos el acceso a tu correo.", listoAbrir: "Abrir el pago de Wompi", listoEnviar: "Enviar comprobante por WhatsApp",
+      listoOtra: "Hacer otra compra", volvioEtiqueta: "Tu pago", volvioTitulo: "¿Ya pagaste en Wompi?", volvioPaga: "No tienes que volver a comprar. Si Wompi te mostró el pago aprobado, solo envíanos el comprobante. Valor de tu pedido:",
+      volvioComprobante: "Con el comprobante te enviamos el acceso a tu correo. Si aún no pagaste, puedes abrir el pago de Wompi otra vez."
     },
     en: {
       seguro: "Secure payment", seguir: "Keep browsing", etiqueta: "Your purchase", titulo: "One more step to return to yourself.",
@@ -127,7 +130,9 @@
       errPreview: "Payments aren’t available in the preview yet.", errRed: "We couldn’t open the payment. Please try again in a moment.",
       incluyeN: "Includes all 5 products", pesos: "Colombian pesos", dolares: "US dollars",
       listoEtiqueta: "Last step", listoTitulo: "Finish your payment on Wompi.", listoPaga: "We opened Wompi’s payment page in another tab. Enter this amount:",
-      listoComprobante: "When you’re done, send us the receipt on WhatsApp and your access will arrive by email.", listoAbrir: "Open Wompi payment", listoEnviar: "Send receipt on WhatsApp"
+      listoComprobante: "When Wompi shows the payment as approved, come back to this Slumen tab and send us the receipt on WhatsApp. Your access will arrive by email.", listoAbrir: "Open Wompi payment", listoEnviar: "Send receipt on WhatsApp",
+      listoOtra: "Make another purchase", volvioEtiqueta: "Your payment", volvioTitulo: "Already paid on Wompi?", volvioPaga: "You don’t need to buy again. If Wompi showed the payment as approved, just send us the receipt. Your order total:",
+      volvioComprobante: "With the receipt we’ll email you your access. If you haven’t paid yet, you can open the Wompi payment again."
     }
   };
   var C = window.SlumenCarrito;
@@ -180,7 +185,7 @@
     if (!C.catalogo) return;
     var m = moneda();
     var lineas = C.lineas(m, lang);
-    $("vacio").hidden = lineas.length > 0;
+    $("vacio").hidden = lineas.length > 0 || !$("listo").hidden;
     $("formulario").hidden = lineas.length === 0 || !$("listo").hidden;
     var ul = $("lineas"); ul.innerHTML = "";
     var total = 0;
@@ -246,11 +251,42 @@
     var texto = "Hola Aleja, te envío el comprobante de mi pago en Wompi.\n" +
       "Pedido: " + lineas.map(function (l) { return l.nombre; }).join(", ") + "\nTotal: " + valor +
       "\nNombre: " + nombre + "\nCorreo: " + email + (celular ? "\nCelular: " + celular : "");
+    var wa = "https://wa.me/573207563404?text=" + encodeURIComponent(texto);
+    // Se recuerda en este navegador: si la persona se sale de Wompi y vuelve, no le pedimos comprar de nuevo.
+    try { localStorage.setItem("slumen-pago-link", JSON.stringify({ link: link, valor: valor, wa: wa, items: C.leer(), fecha: Date.now() })); } catch (e) {}
+    mostrarListo(link, valor, wa, false);
+  }
+
+  function mostrarListo(link, valor, wa, volvio) {
+    var claves = volvio ? ["volvioEtiqueta", "volvioTitulo", "volvioPaga", "volvioComprobante"] : ["listoEtiqueta", "listoTitulo", "listoPaga", "listoComprobante"];
+    var lugares = $("listo").querySelectorAll(".etiqueta, h2, p > span, p[data-t]");
+    lugares.forEach(function (el, i) { if (claves[i]) { el.dataset.t = claves[i]; el.textContent = t(claves[i]); } });
     $("listoTotal").textContent = valor;
     $("listoWompi").href = link;
-    $("listoWhatsapp").href = "https://wa.me/573207563404?text=" + encodeURIComponent(texto);
+    $("listoWhatsapp").href = wa;
+    // Al volver, lo principal es enviar el comprobante.
+    $("listoWhatsapp").className = "boton " + (volvio ? "boton--lleno" : "");
+    $("listoWompi").className = "boton " + (volvio ? "" : "boton--lleno");
+    if (volvio) $("listo").insertBefore($("listoWhatsapp"), $("listoWompi"));
+    else $("listo").insertBefore($("listoWompi"), $("listoWhatsapp"));
+    $("listoWompi").style.marginTop = volvio ? "10px" : ""; $("listoWhatsapp").style.marginTop = volvio ? "" : "10px";
     $("formulario").hidden = true; $("listo").hidden = false;
     $("listo").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  $("listoOtra").addEventListener("click", function () {
+    try { localStorage.removeItem("slumen-pago-link"); } catch (e) {}
+    $("listo").hidden = true; pintar();
+    $("formulario").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  function revisarPagoAnterior() {
+    try {
+      var g = JSON.parse(localStorage.getItem("slumen-pago-link") || "null");
+      if (!g || Date.now() - g.fecha > 3 * 24 * 3600 * 1000) { localStorage.removeItem("slumen-pago-link"); return; }
+      if (C.leer().length && C.leer().join() !== (g.items || []).join()) return; // eligió algo distinto: compra nueva
+      mostrarListo(g.link, g.valor, g.wa, true);
+    } catch (e) {}
   }
 
   document.querySelectorAll("[data-lang]").forEach(function (b) { b.addEventListener("click", function () { ponerIdioma(b.dataset.lang); }); });
@@ -280,7 +316,7 @@
   Promise.all([
     C.cargar(),
     fetch("/api/config").then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) { activas = d.pasarelas || []; }).catch(function () { activas = null; })
-  ]).then(function () { ponerIdioma(lang); });
+  ]).then(function () { ponerIdioma(lang); revisarPagoAnterior(); });
 })();
 </script>
 </body>
