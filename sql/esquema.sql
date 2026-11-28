@@ -77,3 +77,7 @@ CREATE TABLE IF NOT EXISTS archivos_producto (
   actualizado TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (producto, ruta)
 );
+
+-- Cédula de quien compra (agregada después: se crea sola en bases que ya existían).
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS documento TEXT;
+ALTER TABLE pedidos  ADD COLUMN IF NOT EXISTS documento TEXT;

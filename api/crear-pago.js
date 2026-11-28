@@ -1,5 +1,5 @@
 // POST /api/crear-pago
-//   { items: ["metodo", ...], pasarela, comprador: { nombre, email, celular }, idioma, acepta, novedades }
+//   { items: ["metodo", ...], pasarela, comprador: { nombre, email, celular, documento }, idioma, acepta, novedades }
 // Calcula el total con catalogo.json, guarda el pedido en PostgreSQL y devuelve la URL de pago.
 // Si hay sesión, el pedido queda en la cuenta de esa persona (con su correo).
 import { TODAS } from "../lib/pasarelas.mjs";
@@ -25,6 +25,7 @@ const manejar = async req => {
   let nombre = String(c.nombre || "").trim().slice(0, 80);
   let email = String(c.email || "").trim().toLowerCase().slice(0, 120);
   const celular = String(c.celular || "").replace(/[^\d+ ]/g, "").slice(0, 20);
+  const documento = String(c.documento || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 20);
 
   // Sin base de datos todavía: igual se abre el pago de Wompi con el valor exacto;
   // el acceso se entrega a mano mientras se conecta la base.
@@ -43,9 +44,10 @@ const manejar = async req => {
 
   const base = armarPedido(datos.items, PASARELAS[pasarela].moneda, idioma);
   if (!base.items.length) return json({ error: t("Tu carrito está vacío.", "Your cart is empty.") }, 400);
-  if (base.items.some(id => PRODUCTOS[id].evento) && celular.replace(/\D/g, "").length < 7) return json({ error: t("Para el encuentro necesitamos tu celular.", "We need your phone number for the gathering.") }, 400);
+  if (documento.length < 5) return json({ error: t("Escribe tu número de cédula.", "Please write your ID number.") }, 400);
+  if (celular.replace(/\D/g, "").length < 7) return json({ error: t("Escribe tu celular con WhatsApp.", "Please write your WhatsApp number.") }, 400);
 
-  const pedido = { ref: nuevaReferencia(), pasarela, ...base, nombre, email, celular, idioma, usuarioId, aceptaNovedades: !!datos.novedades };
+  const pedido = { ref: nuevaReferencia(), pasarela, ...base, nombre, email, celular, documento, idioma, usuarioId, aceptaNovedades: !!datos.novedades };
   try {
     if (conCuentas) await guardarPedido(pedido);
     else console.warn("[crear-pago] sin base de datos: pedido", pedido.ref, pedido.email, pedido.items.join(","));

@@ -56,8 +56,13 @@
             <span class="ayuda" id="emailAyuda" data-t="emailAyuda">Aquí te llega el acceso a tus productos.</span>
           </div>
           <div class="campo">
-            <label for="celular"><span data-t="celular">Celular</span> <small data-t="opcional">(opcional)</small></label>
-            <input id="celular" name="celular" type="tel" autocomplete="tel" maxlength="20">
+            <label for="documento" data-t="documento">Cédula</label>
+            <input id="documento" name="documento" inputmode="numeric" autocomplete="off" required maxlength="20">
+          </div>
+          <div class="campo">
+            <label for="celular" data-t="celularWa">Celular con WhatsApp</label>
+            <input id="celular" name="celular" type="tel" autocomplete="tel" required maxlength="20" aria-describedby="celularAyuda">
+            <span class="ayuda" id="celularAyuda" data-t="celularAyuda">Al pagar te dejamos tu acceso listo para guardarlo en tu WhatsApp.</span>
           </div>
         </div>
 
@@ -101,7 +106,8 @@
     es: {
       seguro: "Pago seguro", seguir: "Seguir mirando", etiqueta: "Tu compra", titulo: "Un paso más para volver a ti.",
       vacioEtiqueta: "Tu carrito", vacioTitulo: "Todavía no has elegido nada.", vacioTexto: "Mira los tres ejes y agrega lo que hoy te llame.", verEjes: "Ver los productos",
-      datos: "Tus datos", nombre: "Nombre completo", email: "Correo", emailAyuda: "Aquí te llega el acceso a tus productos.", celular: "Celular", opcional: "(opcional)",
+      datos: "Tus datos", nombre: "Nombre completo", email: "Correo", emailAyuda: "Aquí te llega el acceso a tus productos.", celular: "Celular", opcional: "(opcional)", documento: "Cédula", celularWa: "Celular con WhatsApp", celularAyuda: "Al pagar te dejamos tu acceso listo para guardarlo en tu WhatsApp.",
+      errDocumento: "Escribe tu número de cédula.", errCelularWa: "Escribe tu celular con WhatsApp.",
       medio: "Cómo quieres pagar", medioLeyenda: "Medio de pago",
       resumen: "Tu pedido", total: "Total", pagar: "Pagar", quitar: "Quitar", abriendo: "Abriendo el pago…",
       nota1: "Productos digitales: apenas se confirme el pago se crea tu cuenta y te llega el acceso al correo.",
@@ -119,7 +125,8 @@
     en: {
       seguro: "Secure payment", seguir: "Keep browsing", etiqueta: "Your purchase", titulo: "One more step to return to yourself.",
       vacioEtiqueta: "Your cart", vacioTitulo: "You haven’t chosen anything yet.", vacioTexto: "Look through the three paths and add what calls you today.", verEjes: "See the products",
-      datos: "Your details", nombre: "Full name", email: "Email", emailAyuda: "Your access will arrive here.", celular: "Phone", opcional: "(optional)",
+      datos: "Your details", nombre: "Full name", email: "Email", emailAyuda: "Your access will arrive here.", celular: "Phone", opcional: "(optional)", documento: "ID number", celularWa: "WhatsApp number", celularAyuda: "After paying, your access is ready to save on your WhatsApp.",
+      errDocumento: "Please write your ID number.", errCelularWa: "Please write your WhatsApp number.",
       medio: "How you want to pay", medioLeyenda: "Payment method",
       resumen: "Your order", total: "Total", pagar: "Pay", quitar: "Remove", abriendo: "Opening payment…",
       nota1: "Digital products: as soon as the payment is confirmed your account is created and your access arrives by email.",
@@ -210,27 +217,28 @@
 
   function error(txt, campo) {
     $("error").textContent = txt || "";
-    ["nombre", "email"].forEach(function (id) { $(id).removeAttribute("aria-invalid"); });
+    ["nombre", "email", "documento", "celular"].forEach(function (id) { $(id).removeAttribute("aria-invalid"); });
     if (campo) { $(campo).setAttribute("aria-invalid", "true"); $(campo).focus(); }
   }
 
   $("formulario").addEventListener("submit", function (e) {
     e.preventDefault();
     if (enviando) return;
-    var nombre = $("nombre").value.trim(), email = $("email").value.trim(), celular = $("celular").value.trim();
+    var nombre = $("nombre").value.trim(), email = $("email").value.trim(), celular = $("celular").value.trim(), documento = $("documento").value.trim();
     if (nombre.length < 2) return error(t("errNombre"), "nombre");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return error(t("errEmail"), "email");
     if (!elegida) return error(t("errMedio"));
     if (!$("acepta").checked) return error(t("errAcepta"));
-    if (C.leer().indexOf("habitarme") >= 0 && celular.replace(/\D/g, "").length < 7) return error(t("errCelular"), "celular");
+    if (!/^[A-Za-z0-9.\- ]{5,20}$/.test(documento) || documento.replace(/[^A-Za-z0-9]/g, "").length < 5) return error(t("errDocumento"), "documento");
+    if (celular.replace(/\D/g, "").length < 7) return error(t("errCelularWa"), "celular");
     error("");
     // Mientras el servidor no tenga las llaves de Wompi, se paga con el link de pago (catalogo.json > wompi.link).
     var link = C.catalogo.pasarelas[elegida] && C.catalogo.pasarelas[elegida].link;
-    if (link && (!activas || activas.indexOf(elegida) < 0)) return pagarConLink(link, nombre, email, celular);
+    if (link && (!activas || activas.indexOf(elegida) < 0)) return pagarConLink(link, nombre, email, celular, documento);
     enviando = true; $("pagar").disabled = true; pintar();
     fetch("/api/crear-pago", {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ items: C.leer(), pasarela: elegida, comprador: { nombre: nombre, email: email, celular: celular }, idioma: lang, acepta: true, novedades: $("novedades").checked })
+      body: JSON.stringify({ items: C.leer(), pasarela: elegida, comprador: { nombre: nombre, email: email, celular: celular, documento: documento }, idioma: lang, acepta: true, novedades: $("novedades").checked })
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok || !res.d.url) throw new Error(res.d && res.d.error);
@@ -243,14 +251,14 @@
       });
   });
 
-  function pagarConLink(link, nombre, email, celular) {
+  function pagarConLink(link, nombre, email, celular, documento) {
     var m = moneda(), lineas = C.lineas(m, "es"), total = 0;
     lineas.forEach(function (l) { total += l.valor; });
     var valor = C.precio(total, m) + " " + m;
     window.open(link, "_blank", "noopener");
     var texto = "Hola Aleja, te envío el comprobante de mi pago en Wompi.\n" +
       "Pedido: " + lineas.map(function (l) { return l.nombre; }).join(", ") + "\nTotal: " + valor +
-      "\nNombre: " + nombre + "\nCorreo: " + email + (celular ? "\nCelular: " + celular : "");
+      "\nNombre: " + nombre + "\nCédula: " + documento + "\nCorreo: " + email + "\nCelular: " + celular;
     var wa = "https://wa.me/573207563404?text=" + encodeURIComponent(texto);
     // Se recuerda en este navegador: si la persona se sale de Wompi y vuelve, no le pedimos comprar de nuevo.
     try { localStorage.setItem("slumen-pago-link", JSON.stringify({ link: link, valor: valor, wa: wa, items: C.leer(), fecha: Date.now() })); } catch (e) {}
