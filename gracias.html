@@ -64,6 +64,10 @@
       texto = es
         ? "Tu pago quedó confirmado. En las próximas horas te enviamos el acceso a tus productos al correo que escribiste."
         : "Your payment was confirmed. Within the next few hours we’ll send your access to the email you entered.";
+    } else if (estado === "aprobado" && datos && datos.sesion) {
+      texto = es
+        ? "Tu cuenta ya está abierta en este dispositivo. Entra ahora a tu producto. También te enviamos un correo" + (datos.email ? " a " + datos.email : "") + " para entrar después desde otro dispositivo."
+        : "Your account is already open on this device. Go to your product now. We also emailed you" + (datos.email ? " at " + datos.email : "") + " so you can sign in later from another device.";
     } else if (estado === "aprobado") {
       texto = es
         ? "Tus productos ya están en tu cuenta. También te enviamos un correo" + (datos && datos.email ? " a " + datos.email : "") + " con un botón para entrar sin contraseña."
@@ -72,7 +76,9 @@
     $("texto").textContent = texto;
     var acc = $("acciones"); acc.innerHTML = "";
     if (estado === "rechazado") acc.append(boton(es ? "Intentar de nuevo →" : "Try again →", "checkout.html", true));
-    if (estado === "aprobado" && !(datos && datos.sinCuenta)) acc.append(boton(es ? "Ir a mis productos →" : "Go to my products →", "cuenta.html", true));
+    if (estado === "aprobado" && datos && datos.sesion && datos.productos && datos.productos.length === 1) {
+      acc.append(boton(es ? "Entrar a mi producto →" : "Open my product →", "/productos/" + encodeURIComponent(datos.productos[0]) + "/", true));
+    } else if (estado === "aprobado" && !(datos && datos.sinCuenta)) acc.append(boton(es ? "Ir a mis productos →" : "Go to my products →", "cuenta.html", true));
     if (estado !== "verificando") acc.append(boton(es ? "Volver a Slumen" : "Back to Slumen", "index.html", estado === "pendiente" || estado === "desconocido"));
     if (estado === "aprobado" || estado === "pendiente") C.vaciar();
   }
@@ -91,7 +97,8 @@
   var intentos = 0;
   function consultar() {
     intentos++;
-    fetch("/api/confirmar?pasarela=" + encodeURIComponent(pasarela) + "&id=" + encodeURIComponent(id))
+    var miRef = ""; try { miRef = sessionStorage.getItem("slumen-pedido") || localStorage.getItem("slumen-pedido") || ""; } catch (e) {}
+    fetch("/api/confirmar?pasarela=" + encodeURIComponent(pasarela) + "&id=" + encodeURIComponent(id) + (miRef ? "&ref=" + encodeURIComponent(miRef) : ""))
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (d.estado === "pendiente" && intentos < 6) { setTimeout(consultar, 4000); return; }

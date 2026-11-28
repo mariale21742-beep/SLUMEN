@@ -234,7 +234,7 @@
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok || !res.d.url) throw new Error(res.d && res.d.error);
-        try { sessionStorage.setItem("slumen-pedido", res.d.ref); } catch (e2) {}
+        try { sessionStorage.setItem("slumen-pedido", res.d.ref); localStorage.setItem("slumen-pedido", res.d.ref); } catch (e2) {}
         window.location.href = res.d.url;
       })
       .catch(function (err) {
