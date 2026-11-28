@@ -151,6 +151,7 @@
       verProductos: "Ver productos", sinCompras: "Aún no tienes compras.", pedido: "Pedido",
       errCorreo: "Revisa tu correo.", errAcepta: "Acepta la política de datos para continuar.", errRed: "No pudimos enviar el correo. Intenta de nuevo.",
       sinAcceso: "Este producto todavía no está en tu cuenta. Si ya lo compraste, entra con el mismo correo de la compra.",
+      otroDispositivo: "Tu sesión se cerró porque tu cuenta se abrió en otro dispositivo. Cada cuenta puede estar abierta en máximo 2 a la vez. Vuelve a entrar con tu correo.",
       estados: { entregado: "Pagado", aprobado: "Pagado", entregando: "Pagado", pendiente: "En proceso", creado: "Sin pagar", rechazado: "No se completó", revisar: "En revisión", error_entrega: "En revisión" }
     },
     en: {
@@ -166,6 +167,7 @@
       verProductos: "See products", sinCompras: "No purchases yet.", pedido: "Order",
       errCorreo: "Check your email.", errAcepta: "Please accept the data policy to continue.", errRed: "We couldn’t send the email. Please try again.",
       sinAcceso: "This product isn’t in your account yet. If you already bought it, sign in with the email you used to pay.",
+      otroDispositivo: "You were signed out because your account was opened on another device. Each account can be open on up to 2 devices at a time. Sign in again with your email.",
       estados: { entregado: "Paid", aprobado: "Paid", entregando: "Paid", pendiente: "In progress", creado: "Unpaid", rechazado: "Not completed", revisar: "Under review", error_entrega: "Under review" }
     }
   };
@@ -192,6 +194,7 @@
     document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
     document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
     if (q.get("sin_acceso")) { $("sinAcceso").hidden = false; $("sinAcceso").textContent = t("sinAcceso"); }
+    else if (q.get("otro_dispositivo")) { $("sinAcceso").hidden = false; $("sinAcceso").textContent = t("otroDispositivo"); }
     if (datos) pintarCuenta();
   }
 

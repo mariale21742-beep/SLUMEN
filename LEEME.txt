@@ -47,6 +47,10 @@ Cuentas y seguridad
 - Sin contraseñas: se entra con un enlace que llega al correo (más simple para la clienta y nada que se pueda filtrar).
 - La sesión es una cookie HttpOnly de 30 días. En la base solo se guarda el hash de cada token, nunca el token.
 - Máximo 5 enlaces de acceso por correo por hora.
+- Máximo 2 dispositivos con sesión abierta por cuenta: al entrar en un tercero se cierra la sesión más antigua
+  (MAX_DISPOSITIVOS en lib/sesion.mjs). Quien quedó fuera ve un aviso en Mi cuenta.
+- Cada producto muestra abajo "Para <correo> · uso personal" y el correo muy tenue sobre la página,
+  para que cualquier captura compartida diga de quién salió. Al comprar se acepta que es de uso personal.
 - Si la persona compra con la sesión abierta, el pedido queda en su cuenta aunque escriba otro correo.
 - Checkout y Mi cuenta piden aceptar la política de datos; la fecha de aceptación queda guardada.
 - Registro: no hay formulario aparte. En "Entrar" (botón arriba a la derecha, o /cuenta.html) la persona escribe

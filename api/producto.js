@@ -6,7 +6,8 @@ import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { conDb, hayDb } from "../lib/db.mjs";
-import { usuarioActual } from "../lib/sesion.mjs";
+import { usuarioActual, COOKIE } from "../lib/sesion.mjs";
+import { leerCookies } from "../lib/util.mjs";
 import { PRODUCTOS } from "../lib/catalogo.mjs";
 
 const TIPOS = {
@@ -35,6 +36,17 @@ h1{font:600 34px/1.15 'Cormorant Garamond',serif;margin:0 0 12px}a{display:inlin
 // Botón discreto para volver a la cuenta, agregado a cada producto.
 const VOLVER = `<a href="/cuenta.html" style="position:fixed;left:12px;bottom:12px;z-index:2147483000;font:700 13px/1 'Mulish',system-ui,sans-serif;background:#594B43;color:#F8F3EB;text-decoration:none;padding:10px 14px;border-radius:999px;box-shadow:0 10px 24px -12px rgba(0,0,0,.6);opacity:.92">← Mi cuenta</a>`;
 
+const escapar = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// Marca discreta con el correo de quien compró: una franja fija y el correo muy tenue sobre la página.
+// No impide ver nada, pero cualquier captura que se comparta dice de quién salió.
+function marca(email) {
+  const e = escapar(email);
+  const tenue = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="340" height="220"><text x="20" y="130" transform="rotate(-24 170 110)" font-family="system-ui,sans-serif" font-size="15" fill="rgba(89,75,67,0.07)">${e}</text></svg>`);
+  return `<div aria-hidden="true" style="position:fixed;inset:0;z-index:2147482999;pointer-events:none;background-image:url('data:image/svg+xml;charset=utf-8,${tenue}')"></div>`
+    + `<div style="position:fixed;right:12px;bottom:12px;z-index:2147483000;pointer-events:none;font:600 11px/1.3 'Mulish',system-ui,sans-serif;color:#594B43;background:rgba(248,243,235,.88);padding:6px 10px;border-radius:999px;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Para ${e} · uso personal</div>`;
+}
+
 async function leerArchivo(sql, id, relativo) {
   const filas = await sql`select tipo, contenido from archivos_producto where producto = ${id} and ruta = ${relativo}`;
   if (filas.length) return { tipo: filas[0].tipo, datos: filas[0].contenido };
@@ -62,7 +74,12 @@ const manejar = async req => {
   let sql, u;
   try { sql = await conDb(); u = await usuarioActual(req, sql); }
   catch (e) { console.error("[producto]", e); return esPagina ? EN_CAMINO(nombre) : new Response("No disponible", { status: 503 }); }
-  if (!u) return esPagina ? redirigir(`/cuenta.html?volver=${encodeURIComponent(`/productos/${id}/`)}`) : new Response("Inicia sesión", { status: 401 });
+  if (!u) {
+    if (!esPagina) return new Response("Inicia sesión", { status: 401 });
+    // Si traía cookie pero la sesión ya no existe, probablemente entró desde otro dispositivo.
+    const cerrada = leerCookies(req)[COOKIE] ? "&otro_dispositivo=1" : "";
+    return redirigir(`/cuenta.html?volver=${encodeURIComponent(`/productos/${id}/`)}${cerrada}`);
+  }
 
   const acceso = await sql`select 1 from accesos where usuario_id = ${u.id} and producto = ${id}`;
   if (!acceso.length) return esPagina ? redirigir(`/cuenta.html?sin_acceso=${id}`) : new Response("Sin acceso", { status: 403 });
@@ -73,7 +90,7 @@ const manejar = async req => {
   if (esPagina) {
     await sql`update accesos set ultimo_uso = now() where usuario_id = ${u.id} and producto = ${id}`;
     let html = new TextDecoder().decode(archivo.datos);
-    html = html.includes("</body>") ? html.replace(/<\/body>(?![\s\S]*<\/body>)/, VOLVER + "</body>") : html + VOLVER;
+    html = html.includes("</body>") ? html.replace(/<\/body>(?![\s\S]*<\/body>)/, VOLVER + marca(u.email) + "</body>") : html + VOLVER + marca(u.email);
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "private, no-store", "x-robots-tag": "noindex" } });
   }
   return new Response(archivo.datos, { headers: { "content-type": archivo.tipo, "cache-control": "private, max-age=86400" } });
