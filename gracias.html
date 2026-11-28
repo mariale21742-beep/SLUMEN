@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="css/pago.css">
+<style>.nota-wa{flex-basis:100%;margin:2px 0 4px;font-size:14px;opacity:.8}</style>
 </head>
 <body>
 
@@ -79,6 +80,17 @@
     if (estado === "aprobado" && datos && datos.sesion && datos.productos && datos.productos.length === 1) {
       acc.append(boton(es ? "Entrar a mi producto →" : "Open my product →", "/productos/" + encodeURIComponent(datos.productos[0]) + "/", true));
     } else if (estado === "aprobado" && !(datos && datos.sinCuenta)) acc.append(boton(es ? "Ir a mis productos →" : "Go to my products →", "cuenta.html", true));
+    if (estado === "aprobado" && datos && datos.whatsapp) {
+      var wa = boton(es ? "Guardar mi acceso en WhatsApp" : "Save my access on WhatsApp", datos.whatsapp, false);
+      wa.target = "_blank"; wa.rel = "noopener";
+      acc.append(wa);
+      var nota = document.createElement("p");
+      nota.className = "nota-wa";
+      nota.textContent = es
+        ? "Se abre tu WhatsApp con el mensaje y el enlace a tu producto. Envíatelo para tenerlo siempre a mano."
+        : "Your WhatsApp opens with the message and the link to your product. Send it to yourself to keep it handy.";
+      acc.append(nota);
+    }
     if (estado !== "verificando") acc.append(boton(es ? "Volver a Slumen" : "Back to Slumen", "index.html", estado === "pendiente" || estado === "desconocido"));
     if (estado === "aprobado" || estado === "pendiente") C.vaciar();
   }
